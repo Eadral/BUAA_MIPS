@@ -99,8 +99,9 @@ forward Forward(
 	.ForwardRT_E(ForwardRT_E), .ForwardRT_M(ForwardRT_M)
 );
 
-pause Pause(.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), .WDsel_E(WDsel_E), .WDsel_M(WDsel_M), .A3sel_E(A3sel_E),
-				.DM_RE_E(DM_RE_E), .DM_RE_M(DM_RE_M),
+pause Pause(.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), 
+				.WDsel_E(WDsel_E), .WDsel_M(WDsel_M), .A3sel_E(A3sel_E),
+				.DM_WE_D(DM_WE_D), .DM_RE_E(DM_RE_E), .DM_RE_M(DM_RE_M),
 				.GRF_WE_E(GRF_WE_E), .NPCsel_D(NPCsel_D), .pause(pause)
 );
 

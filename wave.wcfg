@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="9" />
+   <WVObjectSize size="11" />
    <wvobject fp_name="/mips_tb/clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -18,6 +18,105 @@
    <wvobject fp_name="/mips_tb/reset" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">reset</obj_property>
       <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mips_tb/uut/Pause/pause" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">pause</obj_property>
+      <obj_property name="ObjectShortName">pause</obj_property>
+   </wvobject>
+   <wvobject fp_name="group97" type="group">
+      <obj_property name="label">Pause</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/mips_tb/uut/Pause/IR_D" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">IR_D[31:0]</obj_property>
+         <obj_property name="ObjectShortName">IR_D[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/IR_E" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">IR_E[31:0]</obj_property>
+         <obj_property name="ObjectShortName">IR_E[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/IR_M" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">IR_M[31:0]</obj_property>
+         <obj_property name="ObjectShortName">IR_M[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/WDsel_E" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">WDsel_E[1:0]</obj_property>
+         <obj_property name="ObjectShortName">WDsel_E[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/DM_WE_D" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">DM_WE_D</obj_property>
+         <obj_property name="ObjectShortName">DM_WE_D</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/DM_RE_E" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">DM_RE_E</obj_property>
+         <obj_property name="ObjectShortName">DM_RE_E</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/WDsel_M" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">WDsel_M[1:0]</obj_property>
+         <obj_property name="ObjectShortName">WDsel_M[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/DM_RE_M" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">DM_RE_M</obj_property>
+         <obj_property name="ObjectShortName">DM_RE_M</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/A3sel_E" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">A3sel_E[1:0]</obj_property>
+         <obj_property name="ObjectShortName">A3sel_E[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/GRF_WE_E" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">GRF_WE_E</obj_property>
+         <obj_property name="ObjectShortName">GRF_WE_E</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/NPCsel_D" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">NPCsel_D[1:0]</obj_property>
+         <obj_property name="ObjectShortName">NPCsel_D[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/lw_r" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">lw_r</obj_property>
+         <obj_property name="ObjectShortName">lw_r</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/lw_b" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">lw_b</obj_property>
+         <obj_property name="ObjectShortName">lw_b</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/lw_o" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">lw_o</obj_property>
+         <obj_property name="ObjectShortName">lw_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/rd_bj" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">rd_bj</obj_property>
+         <obj_property name="ObjectShortName">rd_bj</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/rd_jr" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">rd_jr</obj_property>
+         <obj_property name="ObjectShortName">rd_jr</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/rt_bj" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">rt_bj</obj_property>
+         <obj_property name="ObjectShortName">rt_bj</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/rt_jr" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">rt_jr</obj_property>
+         <obj_property name="ObjectShortName">rt_jr</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/jal_bj" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">jal_bj</obj_property>
+         <obj_property name="ObjectShortName">jal_bj</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/jal_jr" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">jal_jr</obj_property>
+         <obj_property name="ObjectShortName">jal_jr</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/lw_b_m" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">lw_b_m</obj_property>
+         <obj_property name="ObjectShortName">lw_b_m</obj_property>
+      </wvobject>
+      <wvobject fp_name="/mips_tb/uut/Pause/lw_j_m" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">lw_j_m</obj_property>
+         <obj_property name="ObjectShortName">lw_j_m</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="/mips_tb/i" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">i[31:0]</obj_property>
@@ -29,10 +128,12 @@
       <wvobject fp_name="/mips_tb/uut/F_D/IR_F" type="array" db_ref_id="1">
          <obj_property name="ElementShortName">IR_F[31:0]</obj_property>
          <obj_property name="ObjectShortName">IR_F[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
       </wvobject>
       <wvobject fp_name="/mips_tb/uut/F_D/PC4_F" type="array" db_ref_id="1">
          <obj_property name="ElementShortName">PC4_F[31:0]</obj_property>
          <obj_property name="ObjectShortName">PC4_F[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
       </wvobject>
       <wvobject fp_name="/mips_tb/uut/F_D/PC8_F" type="array" db_ref_id="1">
          <obj_property name="ElementShortName">PC8_F[31:0]</obj_property>
@@ -49,14 +150,17 @@
       <wvobject fp_name="/mips_tb/uut/F_D/IR_D" type="array" db_ref_id="1">
          <obj_property name="ElementShortName">IR_D[31:0]</obj_property>
          <obj_property name="ObjectShortName">IR_D[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
       </wvobject>
       <wvobject fp_name="/mips_tb/uut/F_D/PC4_D" type="array" db_ref_id="1">
          <obj_property name="ElementShortName">PC4_D[31:0]</obj_property>
          <obj_property name="ObjectShortName">PC4_D[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
       </wvobject>
       <wvobject fp_name="/mips_tb/uut/F_D/PC8_D" type="array" db_ref_id="1">
          <obj_property name="ElementShortName">PC8_D[31:0]</obj_property>
          <obj_property name="ObjectShortName">PC8_D[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group27" type="group">

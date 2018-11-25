@@ -33,6 +33,7 @@ module pause(
 	 input [31:0] IR_E,
 	 input [31:0] IR_M,
 	 
+	 input DM_WE_D,
 	 input [1:0] WDsel_E,
 	 input DM_RE_E,
 	 input [1:0] WDsel_M,
@@ -44,13 +45,15 @@ module pause(
     output reg pause
     );
 
-reg lw_r, lw_b, lw_o, rd_bj, rd_jr, rt_bj, rt_jr, jal_bj, jal_jr, lw_b_m, lw_j_m;
+reg lw_r, lw_b, lw_sw, lw_o, rd_bj, rd_jr, rt_bj, rt_jr, jal_bj, jal_jr, lw_b_m, lw_j_m;
 
 always @(*) begin
 	//E
 	lw_r = (DM_RE_E && IR_D[`Op] == 6'b0) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
 	lw_b = (DM_RE_E && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
+	lw_sw = (DM_RE_E && DM_WE_D) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
 	lw_o = (DM_RE_E ) && ((IR_D[`Rs] == IR_E[`Rt]) );
+	// DANGEROUS! add rt may repair bugs
 
 	rd_bj = (GRF_WE_E && A3sel_E == 2'b00 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rd]) || (IR_D[`Rt] == IR_E[`Rd]));
 	rd_jr = (GRF_WE_E && A3sel_E == 2'b00 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_E[`Rd]) );
@@ -65,7 +68,7 @@ always @(*) begin
 	lw_b_m = (DM_RE_M && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_M[`Rt]) || (IR_D[`Rt] == IR_M[`Rt]));
 	lw_j_m = (DM_RE_M && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_M[`Rt]) );
 	
-	pause = (lw_r === 1 || lw_b === 1 || lw_o === 1 || 
+	pause = (lw_r === 1 || lw_b === 1 || lw_sw || lw_o === 1 || 
 			  rd_bj === 1 || rd_jr === 1 | rt_bj === 1 || 
 			  rt_jr === 1 || lw_b_m === 1 || lw_j_m === 1)
 		&& !(IR_D[`Op] == 6'b000000 && IR_D[`Func] == 6'b000010)  // j 
