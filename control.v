@@ -306,6 +306,25 @@ case (IR[`Op])
 		GRF_WE	= 1;
 	end
 	
+	6'b001100: begin: andi
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 1;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0010;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		DMOp		= `x;
+		
+		A3sel		= 1;
+		WDsel		= 0;
+		GRF_WE	= 1;
+	end
+	
 	6'b001101: begin: ori
 		NPCsel	= 0;
 		NPCOp		= `x;
