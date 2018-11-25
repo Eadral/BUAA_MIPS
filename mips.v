@@ -165,8 +165,8 @@ control ControlE(.IR(IR_E),
 mux4 MF_RS_E(.s(ForwardRS_E), .out(MF_RS_E_Out), .d0(Rs_E), .d1(ALUOut_M), .d2(MUX_WD_Out), .d3(32'bx));
 mux4 MF_RT_E(.s(ForwardRT_E), .out(MF_RT_E_Out), .d0(Rt_E), .d1(ALUOut_M), .d2(MUX_WD_Out), .d3(32'bx));
 
-mux4 MUX_ALUa(.s(ALUasel_E), .out(ALUa), .d0(MF_RS_E_Out), .d1(0), .d2(MF_RT_E_Out), .d3(32'bx));
-mux4 MUX_ALUb(.s(ALUbsel_E), .out(ALUb), .d0(MF_RT_E_Out), .d1(Ext_E), .d2(PC8_E), .d3({{27{1'b0}}, IR_E[`Shamt]}));
+mux4 MUX_ALUa(.s(ALUasel_E), .out(ALUa), .d0(MF_RS_E_Out), .d1(0), .d2({{27{1'b0}}, IR_E[`Shamt]}), .d3(32'bx));
+mux4 MUX_ALUb(.s(ALUbsel_E), .out(ALUb), .d0(MF_RT_E_Out), .d1(Ext_E), .d2(PC8_E), .d3(32'bx));
 
 stageE E(.ALUa(ALUa), .ALUb(ALUb), .ALUop(ALUOp_E), .ALU_Out(ALU_Out)
 );

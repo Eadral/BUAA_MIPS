@@ -34,11 +34,13 @@ case (Op)
 	4'b0001: Out = A - B;
 	4'b0010: Out = A & B;
 	4'b0011: Out = A | B;
-	4'b0100: Out = A >> B;
-	4'b0101: Out = $signed(A) >>> B;
-	4'b0110: Out = A << B;
+	4'b0100: Out = B >> A;
+	4'b0101: Out = $signed(B) >>> A;
+	4'b0110: Out = B << A;
 	4'b0111: Out = $signed(A) < $signed(B) ? 1 : 0;
-	4'b1000: Out = A < B;
+	4'b1000: Out = A < B ? 1 : 0;
+	4'b1001: Out = ~(A | B);
+	4'b1010: Out = A ^ B;
 	
 	default: Out = 32'bx;
 endcase

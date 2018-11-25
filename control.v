@@ -113,6 +113,25 @@ case (IR[`Op])
 				GRF_WE	= 1;
 			end
 			
+			6'b101011: begin: sltu
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b1000;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
 			6'b000000: begin: sll
 				NPCsel	= 0;
 				NPCOp		= `x;
@@ -120,8 +139,46 @@ case (IR[`Op])
 				ExtOp		= `x;
 				
 				ALUasel	= 2;
-				ALUbsel	= 3;
+				ALUbsel	= 0;
 				ALUOp		= 4'b0110;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b000011: begin: sra
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 2;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0101;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b00010: begin: srl
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 2;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0100;
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
@@ -141,6 +198,120 @@ case (IR[`Op])
 				ALUasel	= 0;
 				ALUbsel	= 0;
 				ALUOp		= 4'b0010;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b100111: begin: nor_
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b1001;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b100101: begin: or_
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0011;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b100110: begin: xor_
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b1010;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b000100: begin: sllv
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0110;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b000111: begin: srav
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0101;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b000110: begin: srlv
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0100;
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
@@ -367,6 +538,44 @@ case (IR[`Op])
 		GRF_WE	= 1;
 	end
 	
+	6'b001010: begin: slti
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 1;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0111;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		DMOp		= `x;
+		
+		A3sel		= 1;
+		WDsel		= 0;
+		GRF_WE	= 1;
+	end
+	
+	6'b001011: begin: sltiu
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 1;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b1000;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		DMOp		= `x;
+		
+		A3sel		= 1;
+		WDsel		= 0;
+		GRF_WE	= 1;
+	end
+	
 	6'b001100: begin: andi
 		NPCsel	= 0;
 		NPCOp		= `x;
@@ -395,6 +604,25 @@ case (IR[`Op])
 		ALUasel	= 0;
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0011;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		DMOp		= `x;
+		
+		A3sel		= 1;
+		WDsel		= 0;
+		GRF_WE	= 1;
+	end
+	
+	6'b001110: begin: xori
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 1;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b1010;
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
