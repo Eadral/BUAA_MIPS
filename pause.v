@@ -34,7 +34,9 @@ module pause(
 	 input [31:0] IR_M,
 	 
 	 input [1:0] WDsel_E,
+	 input DM_RE_E,
 	 input [1:0] WDsel_M,
+	 input DM_RE_M,
 	 input [1:0] A3sel_E,
 	 input GRF_WE_E,
 	 input [1:0] NPCsel_D,
@@ -46,9 +48,9 @@ reg lw_r, lw_b, lw_o, rd_bj, rd_jr, rt_bj, rt_jr, jal_bj, jal_jr, lw_b_m, lw_j_m
 
 always @(*) begin
 	//E
-	lw_r = (WDsel_E == 2'b01 && IR_D[`Op] == 6'b0) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
-	lw_b = (WDsel_E == 2'b01 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
-	lw_o = (WDsel_E == 2'b01 ) && ((IR_D[`Rs] == IR_E[`Rt]) );
+	lw_r = (DM_RE_E && IR_D[`Op] == 6'b0) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
+	lw_b = (DM_RE_E && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
+	lw_o = (DM_RE_E ) && ((IR_D[`Rs] == IR_E[`Rt]) );
 
 	rd_bj = (GRF_WE_E && A3sel_E == 2'b00 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rd]) || (IR_D[`Rt] == IR_E[`Rd]));
 	rd_jr = (GRF_WE_E && A3sel_E == 2'b00 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_E[`Rd]) );
@@ -58,8 +60,8 @@ always @(*) begin
 	jal_jr = (GRF_WE_E && A3sel_E == 2'b11 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == 5'd31) );
 	
 	//M
-	lw_b_m = (WDsel_M == 2'b01 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_M[`Rt]) || (IR_D[`Rt] == IR_M[`Rt]));
-	lw_j_m = (WDsel_M == 2'b01 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_M[`Rt]) );
+	lw_b_m = (DM_RE_M && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_M[`Rt]) || (IR_D[`Rt] == IR_M[`Rt]));
+	lw_j_m = (DM_RE_M && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_M[`Rt]) );
 	
 	pause = (lw_r === 1 || lw_b === 1 || lw_o === 1 || 
 			  rd_bj === 1 || rd_jr === 1 | rt_bj === 1 || 

@@ -111,10 +111,10 @@ module stageM(
 	 
 	 input [31:0] DM_A,
 	 input [31:0] DM_WD,
-	 output [31:0] DM_Out,
+	 output reg [31:0] DM_Out,
 	 input DM_RE,
 	 input DM_WE,
-	 
+	 input [1:0] DMOp,
 	 input clk,
 	 input reset,
 	 
@@ -122,9 +122,40 @@ module stageM(
 	 
     );
 
+wire [31:0] MUX_SB_OUT;
+mux4 MUX_SB(.out(MUX_SB_OUT), .s(DM_A[1:0]),
+				.d0({DM_Out[31:8], DM_WD[7:0]}), .d1({DM_Out[31:16], DM_WD[7:0], DM_Out[7:0]}),
+				.d2({DM_Out[31:24], DM_WD[7:0], DM_Out[15:0]}), .d3({DM_WD[7:0], DM_Out[23:0]}) );
 
-dm DM(.A(DM_A), .WD(DM_WD), .RD(DM_Out), .RE(DM_RE), .WE(DM_WE), .clk(clk), .Reset(reset), .PC(PC));
+wire [31:0] MUX_DM_WD_Out;
+muxe #(2) MUX_DM_WD(.out(MUX_DM_WD_Out), .s(DMOp), .e(2'b01),
+						  .d0(DM_WD), .d1(MUX_SB_OUT));
 
+wire [31:0] DM_Out_dm;
+dm DM(.A(DM_A), .WD(MUX_DM_WD_Out), .RD(DM_Out_dm), .RE(DM_RE), .WE(DM_WE), .clk(clk), .Reset(reset), .PC(PC));
+
+wire [31:0] MUX_LB_Out;
+mux4 MUX_LB(.out(MUX_LB_Out), .s(DM_A[1:0]),
+			   .d0({{24{DM_Out_dm[7]}}, DM_Out_dm[7:0]}),
+			   .d1({{24{DM_Out_dm[15]}}, DM_Out_dm[15:8]}),
+			   .d2({{24{DM_Out_dm[23]}}, DM_Out_dm[23:16]}),
+			   .d3({{24{DM_Out_dm[31]}}, DM_Out_dm[31:24]})
+				);
+
+wire [31:0] MUX_LBU_Out;
+mux4 MUX_LBU(.out(MUX_LBU_Out), .s(DM_A[1:0]),
+			   .d0({{24{1'b0}}, DM_Out_dm[7:0]}),
+			   .d1({{24{1'b0}}, DM_Out_dm[15:8]}),
+			   .d2({{24{1'b0}}, DM_Out_dm[23:16]}),
+			   .d3({{24{1'b0}}, DM_Out_dm[31:24]})
+				);
+
+always @(*)
+case (DMOp)
+	2: DM_Out = MUX_LB_Out;
+	3: DM_Out = MUX_LBU_Out;
+	default: DM_Out = DM_Out_dm;
+endcase
 
 endmodule
 

@@ -46,10 +46,9 @@ always @(negedge clk) begin
 	if (Reset) begin
 		for (i = 0; i < 32; i = i + 1)
 			R[i] <= 0;
-	end else if (WE) begin
+	end else if (WE && WA != 5'b00000) begin
 		$display("@%h: $%d <= %h", PC, WA, WD);
-		if (WA != 5'b00000)
-			R[WA] <= WD;
+		R[WA] <= WD;
 	end
 end
 
