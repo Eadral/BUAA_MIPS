@@ -43,7 +43,7 @@ module mips_tb;
 		// Wait 100 ns for global reset to finish
 		#5;
 	
-		for (i = 0; i < 50; i = i + 1)
+		for (i = 0; i < 200; i = i + 1)
 			#5 clk = ~clk;
         
 		$finish;

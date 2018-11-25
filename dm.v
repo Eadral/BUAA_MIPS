@@ -41,7 +41,7 @@ always @(posedge clk) begin
 		for (i = 0; i < 1024; i = i + 1)
 			dm[i] <= 0;
 	end if (WE) begin
-		$display("@%h: *%h <= %h", PC, A, WD);
+		$display("%d@%h: *%h <= %h", $time, PC, A, WD);
 		dm[A[11:2]] <= WD;
 	end
 end

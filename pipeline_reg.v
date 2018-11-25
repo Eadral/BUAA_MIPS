@@ -26,7 +26,8 @@ module F_D_reg(
     output reg [31:0] PC4_D,
     output reg [31:0] PC8_D,
 	 input clk,
-    input stall
+    input stall,
+	 input reset
     );
 
 initial begin
@@ -36,6 +37,11 @@ initial begin
 end
 
 always @(posedge clk) begin
+	if (reset) begin
+		IR_D = 32'b0;
+		PC4_D = 32'b0;
+		PC8_D = 32'b0;
+	end else
 	if (!stall) begin
 		IR_D  <= IR_F ;
 		PC4_D <= PC4_F;
@@ -64,7 +70,8 @@ module D_E_reg(
 	 output reg [31:0] Rt_E,
 	 output reg [31:0] Ext_E,
 	 input clk,
-	 input clr
+	 input clr,
+	 input reset
     );
 	 
 initial begin
@@ -77,6 +84,14 @@ initial begin
 end
 
 always @(posedge clk) begin
+	if (reset) begin
+		IR_E	= 32'b0; 
+		PC4_E	= 32'b0; 
+		PC8_E	= 32'b0; 
+		Rs_E	= 32'b0; 
+		Rt_E	= 32'b0; 
+		Ext_E	= 32'b0; 
+	end else
 	if (clr) begin
 		IR_E	<= 32'b0; 
 		PC4_E	<= 32'b0; 
@@ -113,7 +128,8 @@ module E_M_reg(
 	 output reg [31:0] ALUOut_M,
 	 output reg [31:0] XALUOut_M,
 	 output reg [31:0] Rt_M,
-	 input clk
+	 input clk,
+	 input reset
     );
 
 initial begin
@@ -126,13 +142,21 @@ initial begin
 end
 
 always @(posedge clk) begin
-	IR_M	<= 		IR_E;
-	PC4_M <=       PC4_E;
-	PC8_M <=       PC8_E;
-	ALUOut_M <=    ALUOut_E;
-	XALUOut_M <=   XALUOut_E;
-   Rt_M <=        Rt_E;
-
+	if (reset) begin
+		IR_M	= 32'b0;
+		PC4_M = 32'b0;
+		PC8_M = 32'b0;
+		ALUOut_M = 32'b0;
+		XALUOut_M = 32'b0;
+		Rt_M = 32'b0;
+	end else begin
+		IR_M	<= 		IR_E;
+		PC4_M <=       PC4_E;
+		PC8_M <=       PC8_E;
+		ALUOut_M <=    ALUOut_E;
+		XALUOut_M <=   XALUOut_E;
+		Rt_M <=        Rt_E;
+	end
 end
 
 
@@ -155,7 +179,8 @@ module M_W_reg(
 	 output reg [31:0] ALUOut_W,
 	 output reg [31:0] XALUOut_W,
 	 output reg [31:0] DM_W,
-	 input clk
+	 input clk,
+	 input reset
     );
 
 initial begin
@@ -168,12 +193,21 @@ initial begin
 end
 
 always @(posedge clk) begin
-	IR_W		<= IR_M;
-   PC4_W		<= PC4_M;
-   PC8_W		<= PC8_M;
-   ALUOut_W	<= ALUOut_M;
-   XALUOut_W<= XALUOut_M;
-   DM_W		<= DM_M;
+	if (reset) begin
+		IR_W		= 32'b0;
+		PC4_W		= 32'b0;
+		PC8_W		= 32'b0;
+		ALUOut_W	= 32'b0;
+		XALUOut_W= 32'b0;
+		DM_W		= 32'b0;
+	end else begin
+		IR_W		<= IR_M;
+		PC4_W		<= PC4_M;
+		PC8_W		<= PC8_M;
+		ALUOut_W	<= ALUOut_M;
+		XALUOut_W<= XALUOut_M;
+		DM_W		<= DM_M;
+	end
 end
 
 endmodule

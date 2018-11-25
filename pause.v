@@ -53,7 +53,7 @@ always @(*) begin
 	lw_b = (DM_RE_E && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
 	lw_sw = (DM_RE_E && DM_WE_D) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
 	lw_o = (DM_RE_E ) && ((IR_D[`Rs] == IR_E[`Rt]) );
-	// DANGEROUS! add rt may repair bugs
+	// DANGEROUS! add rt may repair new bugs
 
 	rd_bj = (GRF_WE_E && A3sel_E == 2'b00 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rd]) || (IR_D[`Rt] == IR_E[`Rd]));
 	rd_jr = (GRF_WE_E && A3sel_E == 2'b00 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_E[`Rd]) );
@@ -72,7 +72,8 @@ always @(*) begin
 			  rd_bj === 1 || rd_jr === 1 | rt_bj === 1 || 
 			  rt_jr === 1 || lw_b_m === 1 || lw_j_m === 1)
 		&& !(IR_D[`Op] == 6'b000000 && IR_D[`Func] == 6'b000010)  // j 
-		  
+		
+		&& !(IR_E == 32'b0) // stalling
 			  ;
 end
 

@@ -90,13 +90,16 @@ wire [4:0] MUX_A3_Out;
 //wire [31:0] MUX_WD_Out;
 wire [1:0] DMOp_D, DMOp_E, DMOp_M, DMOp_W;
 
+wire [31:0] GRF_RD1_Out, GRF_RD2_Out;
+
 //
 
 forward Forward(
 	.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), .IR_W(IR_W), 
 	.RWE_E(GRF_WE_E), .A3sel_E(A3sel_E), .RWE_M(GRF_WE_M), .A3sel_M(A3sel_M), .RWE_W(GRF_WE_W), .A3sel_W(A3sel_W),
 	.ForwardRS_D(ForwardRS_D), .ForwardRT_D(ForwardRT_D), .ForwardRS_E(ForwardRS_E),
-	.ForwardRT_E(ForwardRT_E), .ForwardRT_M(ForwardRT_M)
+	.ForwardRT_E(ForwardRT_E), .ForwardRT_M(ForwardRT_M),
+	.GRF_A3(GRF_A3), .Forward_RD1(Forward_RD1), .Forward_RD2(Forward_RD2)
 );
 
 pause Pause(.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), 
@@ -123,7 +126,7 @@ stageF F(.PC(PC), .clk(clk), .reset(reset),
 // D
 
 
-F_D_reg F_D(.IR_F(IR_F), .PC4_F(PC), .PC8_F(PC8_F), .clk(clk), .stall(pause),
+F_D_reg F_D(.IR_F(IR_F), .PC4_F(PC), .PC8_F(PC8_F), .clk(clk), .stall(pause), .reset(reset),
 				.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D) );
 
 
@@ -133,11 +136,13 @@ control ControlD(.IR(IR_D),
 					  .DM_RE(DM_RE_D), .DM_WE(DM_WE_D), .DMOp(DMOp_D),
 					  .A3sel(A3sel_D), .WDsel(WDsel_D), .GRF_WE(GRF_WE_D));
 
+mux2 MF_RD1(.s(Forward_RD1), .out(GRF_RD1), .d0(GRF_RD1_Out), .d1(GRF_WD));
+mux2 MF_RD2(.s(Forward_RD2), .out(GRF_RD2), .d0(GRF_RD2_Out), .d1(GRF_WD));
 
 mux4 MF_RS_D(.s(ForwardRS_D), .out(MF_RS_D_Out), .d0(GRF_RD1), .d1(ALUOut_M), .d2(MUX_WD_Out), .d3(PC8_E));
 mux4 MF_RT_D(.s(ForwardRT_D), .out(MF_RT_D_Out), .d0(GRF_RD2), .d1(ALUOut_M), .d2(MUX_WD_Out), .d3(PC8_E));
 
-stageD D(.GRF_A1(IR_D[`Rs]), .GRF_A2(IR_D[`Rt]), .GRF_RD1(GRF_RD1), .GRF_RD2(GRF_RD2),
+stageD D(.GRF_A1(IR_D[`Rs]), .GRF_A2(IR_D[`Rt]), .GRF_RD1(GRF_RD1_Out), .GRF_RD2(GRF_RD2_Out),
 			.CMP_D1(MF_RS_D_Out), .CMP_D2(MF_RT_D_Out), .CMPOp(CMPOp_D), /*.Jump(Jump),*/
 			.Ext_In(IR_D[`Imm]), .Ext_Out(Ext_Out), .ExtOp(ExtOp_D),
 			.NPC_PC4(PC4_D), .NPC_Addr(IR_D[`Addr]), .npcOp(NPCOp_D), .NPCOut(NPC_Out),
@@ -151,7 +156,7 @@ stageD D(.GRF_A1(IR_D[`Rs]), .GRF_A2(IR_D[`Rt]), .GRF_RD1(GRF_RD1), .GRF_RD2(GRF
 // E
 
 
-D_E_reg D_E(.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D), .Rs_D(GRF_RD1), .Rt_D(GRF_RD2), .Ext_D(Ext_Out), .clk(clk), .clr(pause),
+D_E_reg D_E(.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D), .Rs_D(MF_RS_D_Out), .Rt_D(MF_RT_D_Out), .Ext_D(Ext_Out), .clk(clk), .clr(pause), .reset(reset),
 				.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .Rs_E(Rs_E), .Rt_E(Rt_E), .Ext_E(Ext_E));
 
 control ControlE(.IR(IR_E), 
@@ -174,7 +179,7 @@ stageE E(.ALUa(ALUa), .ALUb(ALUb), .ALUop(ALUOp_E), .ALU_Out(ALU_Out)
 // M
 
 
-E_M_reg E_M(.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .ALUOut_E(ALU_Out), .XALUOut_E(), .Rt_E(MF_RT_E_Out), .clk(clk),
+E_M_reg E_M(.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .ALUOut_E(ALU_Out), .XALUOut_E(), .Rt_E(MF_RT_E_Out), .clk(clk), .reset(reset),
 				.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .Rt_M(Rt_M));
 
 
@@ -196,7 +201,7 @@ stageM M(.DM_A(ALUOut_M), .DM_WD(MF_RT_M_Out), .DM_Out(DM_Out),
 // W
 
 
-M_W_reg M_W(.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .DM_M(DM_Out), .clk(clk),
+M_W_reg M_W(.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .DM_M(DM_Out), .clk(clk), .reset(reset),
 				.IR_W(IR_W), .PC4_W(PC4_W), .PC8_W(PC8_W), .ALUOut_W(ALUOut_W), .XALUOut_W(XALUOut_W), .DM_W(DM_W));
 
 
