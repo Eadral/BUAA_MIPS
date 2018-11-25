@@ -47,9 +47,9 @@ wire [31:0] PC;
 wire [31:0] IR_F, /*PC4_F,*/ PC8_F;
 
 wire [31:0] /*IR_D,*/ PC4_D, PC8_D;
-wire [1:0] ExtOp_D, NPCOp_D, CMPOp_D;
+wire [1:0] ExtOp_D, NPCOp_D;
 wire [1:0] ALUasel_D, ALUbsel_D;
-wire [3:0] ALUOp_D;
+wire [3:0] ALUOp_D, CMPOp_D;
 wire DM_RE_D, DM_WE_D, GRF_WE_D;
 wire [1:0] A3sel_D, WDsel_D;
 wire [31:0] GRF_RD1, GRF_RD2, Ext_Out, PC4_W/*, NPC_Out*/;
@@ -60,9 +60,9 @@ wire [31:0] MF_RT_D_Out;
 wire [31:0] ALUOut_M, MUX_WD_Out;
 wire [31:0] /*IR_E,*/ PC4_E, PC8_E, Rs_E, Rt_E, Ext_E;
 
-wire [1:0] ExtOp_E, NPCOp_E, CMPOp_E;
+wire [1:0] ExtOp_E, NPCOp_E;
 wire [1:0] ALUasel_E, ALUbsel_E, NPCsel_E;
-wire [3:0] ALUOp_E;
+wire [3:0] ALUOp_E, CMPOp_E;
 wire DM_RE_E, DM_WE_E;
 wire [31:0] MF_RS_E_Out, MF_RT_E_Out;
 wire [31:0] ALUa, ALUb;
@@ -70,9 +70,9 @@ wire [31:0] ALU_Out;
 
 wire [31:0] /*IR_M,*/ PC4_M, PC8_M, /*ALUOut_M,*/ XALUOut_M, Rt_M;
 
-wire [1:0] ExtOp_M, NPCOp_M, CMPOp_M;
+wire [1:0] ExtOp_M, NPCOp_M;
 wire [1:0] ALUasel_M, ALUbsel_M, NPCsel_M;
-wire [3:0] ALUOp_M;
+wire [3:0] ALUOp_M, CMPOp_M;
 wire DM_RE_M, DM_WE_M/*, GRF_WE_M*/;
 
 wire [31:0] MF_RT_M_Out;
@@ -80,9 +80,9 @@ wire [31:0] DM_Out;
 
 wire [31:0] /*IR_W,*/ PC8_W, ALUOut_W, XALUOut_W, DM_W;
 
-wire [1:0] ExtOp_W, NPCOp_W, CMPOp_W;
+wire [1:0] ExtOp_W, NPCOp_W;
 wire [1:0] ALUasel_W, ALUbsel_W, NPCsel_W;
-wire [3:0] ALUOp_W;
+wire [3:0] ALUOp_W, CMPOp_W;
 wire DM_RE_W, DM_WE_W/*, GRF_WE_W*/;
 wire [1:0] /*A3sel_W,*/ WDsel_W;
 

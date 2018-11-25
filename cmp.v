@@ -19,21 +19,26 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module cmp(
-    input [31:0] A,
-    input [31:0] B,
-    input [1:0] Op,
-    output Zero
+    input [31:0] Rs,
+    input [31:0] Rt,
+    input [3:0] Op,
+    output reg Jump
     );
 
-/*
+
 always @(*) begin
 case (Op)
-	2'b00: Zero = (A == B) ? 1 : 0;
-	default: Zero = (A == B) ? 1 : 0;
+	0: Jump = ($signed(Rs) == $signed(Rt)) ? 1 : 0;
+	1: Jump = ($signed(Rs) >= 0) ? 1 : 0;
+	2: Jump = ($signed(Rs) > 0) ? 1 : 0;
+	3: Jump = ($signed(Rs) <= 0) ? 1 : 0;
+	4: Jump = ($signed(Rs) < 0) ? 1 : 0;
+	5: Jump = ($signed(Rs) != $signed(Rt)) ? 1 : 0;
+	default: Jump = (Rs == Rt) ? 1 : 0;
 endcase
 end
-*/
 
-assign Zero = (A == B) ? 1 : 0;
+
+
 
 endmodule

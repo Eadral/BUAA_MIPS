@@ -53,7 +53,7 @@ module stageD(
 	 
 	 input [31:0] CMP_D1,
 	 input [31:0] CMP_D2,
-	 input [1:0] CMPOp,
+	 input [3:0] CMPOp,
 
 	 input [15:0] Ext_In,
 	 output [31:0] Ext_Out,
@@ -77,7 +77,7 @@ module stageD(
 	 
 grf GRF(.RA1(GRF_A1), .RA2(GRF_A2), .WA(GRF_A3), .WD(GRF_WD), .RD1(GRF_RD1), .RD2(GRF_RD2), .Reset(reset), .clk(clk), .WE(GRF_WE), .PC(PC));
 
-cmp CMP(.A(CMP_D1), .B(CMP_D2), .Op(CMPOp), .Zero(Jump));
+cmp CMP(.Rs(CMP_D1), .Rt(CMP_D2), .Op(CMPOp), .Jump(Jump));
 
 ext Ext(.In(Ext_In), .Out(Ext_Out), .Op(ExtOp));
 

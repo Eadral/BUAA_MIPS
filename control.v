@@ -35,7 +35,7 @@ module control(
 	 
 	 output reg [1:0] NPCsel,
 	 output reg [1:0] NPCOp,
-	 output reg [1:0] CMPOp,
+	 output reg [3:0] CMPOp,
 	 output reg [1:0] ExtOp,
 
 	 
@@ -210,6 +210,67 @@ case (IR[`Op])
 		endcase
 	end
 	
+	6'b000001: begin
+		case (IR[`Rt]) 
+			5'b00001: begin: bgez
+				NPCsel	= 1;
+				NPCOp		= 0;
+				CMPOp		= 1;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= `x;
+				DM_WE		= `x;
+				DMOp		= `x;
+				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= `x;
+			end
+			
+			5'b00000: begin: bltz
+				NPCsel	= 1;
+				NPCOp		= 0;
+				CMPOp		= 4;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= `x;
+				DM_WE		= `x;
+				DMOp		= `x;
+				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= `x;
+			end
+			
+			default: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= 4'bxxxx;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end
+			
+		endcase
+	end
 	
 	6'b101011: begin: sw
 		NPCsel	= 0;
@@ -400,6 +461,63 @@ case (IR[`Op])
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= `x;
+	end
+	
+	6'b000111: begin: bgtz
+		NPCsel	= 1;
+		NPCOp		= 0;
+		CMPOp		= 2;
+		ExtOp		= `x;
+		
+		ALUasel	= `x;
+	   ALUbsel	= `x;
+		ALUOp		= `x;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		DMOp		= `x;
+		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= 0;
+	end
+	
+	6'b000110: begin: blez
+		NPCsel	= 1;
+		NPCOp		= 0;
+		CMPOp		= 3;
+		ExtOp		= `x;
+		
+		ALUasel	= `x;
+	   ALUbsel	= `x;
+		ALUOp		= `x;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		DMOp		= `x;
+		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= 0;
+	end
+	
+	6'b000101: begin: bne
+		NPCsel	= 1;
+		NPCOp		= 0;
+		CMPOp		= 5;
+		ExtOp		= `x;
+		
+		ALUasel	= `x;
+	   ALUbsel	= `x;
+		ALUOp		= `x;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		DMOp		= `x;
+		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= 0;
 	end
 	
 	6'b000010: begin: j
