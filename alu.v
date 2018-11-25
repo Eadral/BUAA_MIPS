@@ -37,7 +37,7 @@ case (Op)
 	4'b0100: Out = A >> B;
 	4'b0101: Out = $signed(A) >>> B;
 	4'b0110: Out = A << B;
-	4'b0111: Out = $signed(A) < $signed(B);
+	4'b0111: Out = $signed(A) < $signed(B) ? 1 : 0;
 	4'b1000: Out = A < B;
 	
 	default: Out = 32'bx;

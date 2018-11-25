@@ -22,20 +22,17 @@ module F_D_reg(
     input [31:0] IR_F,
     input [31:0] PC4_F,
     input [31:0] PC8_F,
-	 input RWE_F,
     output reg [31:0] IR_D,
     output reg [31:0] PC4_D,
     output reg [31:0] PC8_D,
-    output reg RWE_D,
 	 input clk,
     input stall
     );
 
 initial begin
-	IR_D <= 32'b0;
-	PC4_D <= 32'b0;
-	PC8_D <= 32'b0;
-	RWE_D <= 0;
+	IR_D = 32'b0;
+	PC4_D = 32'b0;
+	PC8_D = 32'b0;
 end
 
 always @(posedge clk) begin
@@ -43,7 +40,6 @@ always @(posedge clk) begin
 		IR_D  <= IR_F ;
 		PC4_D <= PC4_F;
 		PC8_D <= PC8_F;
-		RWE_D <= RWE_F;
 	end
 
 end
@@ -61,14 +57,12 @@ module D_E_reg(
     input [31:0] Rs_D,
     input [31:0] Rt_D,
     input [31:0] Ext_D,
-	 input RWE_D,
 	 output reg [31:0] IR_E,
 	 output reg [31:0] PC4_E,
 	 output reg [31:0] PC8_E,
 	 output reg [31:0] Rs_E,
 	 output reg [31:0] Rt_E,
 	 output reg [31:0] Ext_E,
-	 output reg RWE_E,
 	 input clk,
 	 input clr
     );
@@ -80,7 +74,6 @@ initial begin
 	Rs_E	= 32'b0; 
 	Rt_E	= 32'b0; 
 	Ext_E	= 32'b0; 
-	RWE_E = 0;
 end
 
 always @(posedge clk) begin
@@ -91,7 +84,6 @@ always @(posedge clk) begin
 		Rs_E	<= 32'b0; 
 		Rt_E	<= 32'b0; 
 		Ext_E	<= 32'b0; 
-		RWE_E <= 0;
 	end else begin
 		IR_E	<= IR_D; 
 		PC4_E	<= PC4_D; 
@@ -99,7 +91,6 @@ always @(posedge clk) begin
 		Rs_E	<= Rs_D; 
 		Rt_E	<= Rt_D; 
 		Ext_E	<= Ext_D; 
-		RWE_E <= RWE_D;
 	end
 end
 
@@ -116,14 +107,12 @@ module E_M_reg(
     input [31:0] ALUOut_E,
     input [31:0] XALUOut_E,
     input [31:0] Rt_E,
-	 input RWE_E,
 	 output reg [31:0] IR_M,
 	 output reg [31:0] PC4_M,
 	 output reg [31:0] PC8_M,
 	 output reg [31:0] ALUOut_M,
 	 output reg [31:0] XALUOut_M,
 	 output reg [31:0] Rt_M,
-	 output reg RWE_M,
 	 input clk
     );
 
@@ -134,7 +123,6 @@ initial begin
 	ALUOut_M = 32'b0;
 	XALUOut_M = 32'b0;
    Rt_M = 32'b0;
-	RWE_M = 0;
 end
 
 always @(posedge clk) begin
@@ -144,7 +132,7 @@ always @(posedge clk) begin
 	ALUOut_M <=    ALUOut_E;
 	XALUOut_M <=   XALUOut_E;
    Rt_M <=        Rt_E;
-	RWE_M <= 		RWE_E;
+
 end
 
 
@@ -161,25 +149,22 @@ module M_W_reg(
     input [31:0] ALUOut_M,
     input [31:0] XALUOut_M,
     input [31:0] DM_M,
-	 input RWE_M,
 	 output reg [31:0] IR_W,
 	 output reg [31:0] PC4_W,
 	 output reg [31:0] PC8_W,
 	 output reg [31:0] ALUOut_W,
 	 output reg [31:0] XALUOut_W,
 	 output reg [31:0] DM_W,
-	 output reg RWE_W,
 	 input clk
     );
 
 initial begin
-	IR_W		 = 32'b0;
-   PC4_W		 = 32'b0;
-   PC8_W		 = 32'b0;
-   ALUOut_W	 = 32'b0;
-   XALUOut_W = 32'b0;
-   DM_W		 = 32'b0;
-	RWE_W		 = 0;
+	IR_W		= 32'b0;
+   PC4_W		= 32'b0;
+   PC8_W		= 32'b0;
+   ALUOut_W	= 32'b0;
+   XALUOut_W= 32'b0;
+   DM_W		= 32'b0;
 end
 
 always @(posedge clk) begin
@@ -189,7 +174,6 @@ always @(posedge clk) begin
    ALUOut_W	<= ALUOut_M;
    XALUOut_W<= XALUOut_M;
    DM_W		<= DM_M;
-	RWE_W   	<= RWE_M;
 end
 
 endmodule

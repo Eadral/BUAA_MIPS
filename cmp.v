@@ -21,12 +21,19 @@
 module cmp(
     input [31:0] A,
     input [31:0] B,
-    input Op,
+    input [1:0] Op,
     output Zero
     );
 
-assign Jump = A == B ? 1 : 0;
+/*
+always @(*) begin
+case (Op)
+	2'b00: Zero = (A == B) ? 1 : 0;
+	default: Zero = (A == B) ? 1 : 0;
+endcase
+end
+*/
 
-
+assign Zero = (A == B) ? 1 : 0;
 
 endmodule

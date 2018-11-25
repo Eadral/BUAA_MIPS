@@ -19,16 +19,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module npc(
-    input [31:0] PC4,
+    input [31:0] PC,
     input [25:0] Add,
-	 input npcOp,
+	 input [1:0] npcOp,
+	 input Jump,
     output reg [31:0] NPC
     );
 
 always @(*) begin
 case (npcOp)
-	0: NPC = PC4 + ({{16{Add[15]}}, Add[15:0]} << 2);
-	1: NPC = {PC4[31:28], Add, 2'b00};
+	0: begin
+		if (Jump)
+			NPC = PC + 4 + ({{16{Add[15]}}, Add[15:0]} << 2);
+		else
+			NPC = PC + 8;
+	end
+	1: NPC = {PC[31:28], Add, 2'b00};
 endcase
 end
 

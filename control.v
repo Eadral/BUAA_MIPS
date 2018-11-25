@@ -35,12 +35,13 @@ module control(
 	 
 	 output reg [1:0] NPCsel,
 	 output reg [1:0] NPCOp,
+	 output reg [1:0] CMPOp,
 	 output reg [1:0] ExtOp,
 
 	 
 	 output reg [1:0] ALUasel,
 	 output reg [1:0] ALUbsel,
-	 output reg [1:0] ALUOp,
+	 output reg [3:0] ALUOp,
 	 
 	 output reg DM_RE,
 	 output reg DM_WE,
@@ -57,6 +58,7 @@ case (IR[`Op])
 			6'b100001: begin: addu
 				NPCsel	= 0;
 				NPCOp		= `x;
+				CMPOp		= `x;
 				ExtOp		= `x;
 				
 				ALUasel	= 0;
@@ -71,21 +73,94 @@ case (IR[`Op])
 				GRF_WE	= 1;
 			end
 			
-			default: begin
-				NPCsel	= `x;
+			6'b100011: begin: subu
+				NPCsel	= 0;
 				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0001;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b101010: begin: slt
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0111;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b001001: begin: jalr
+				NPCsel	= 2;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 1;
+				ALUbsel	= 2;
+				ALUOp		= 4'b0000;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b001000: begin: jr
+				NPCsel	= 2;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end
+			
+			default: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
 				ExtOp		= `x;
 				
 				ALUasel	= `x;
 				ALUbsel	= `x;
 				ALUOp		= 4'bxxxx;
 			
-				DM_RE		= `x;
-				DM_WE		= `x;
+				DM_RE		= 0;
+				DM_WE		= 0;
 				
 				A3sel		= `x;
 				WDsel		= `x;
-				GRF_WE	= `x;
+				GRF_WE	= 0;
 			end
 		endcase
 	end
@@ -93,6 +168,7 @@ case (IR[`Op])
 	6'b001101: begin: ori
 		NPCsel	= 0;
 		NPCOp		= `x;
+		CMPOp		= `x;
 		ExtOp		= 1;
 		
 		ALUasel	= 0;
@@ -110,7 +186,26 @@ case (IR[`Op])
 	6'b001111: begin: lui
 		NPCsel	= 0;
 		NPCOp		= `x;
+		CMPOp		= `x;
 		ExtOp		= 2;
+		
+		ALUasel	= 1;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0000;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		
+		A3sel		= 1;
+		WDsel		= 0;
+		GRF_WE	= 1;
+	end
+	
+	6'b001001: begin: addiu
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 0;
 		
 		ALUasel	= 0;
 	   ALUbsel	= 1;
@@ -124,14 +219,51 @@ case (IR[`Op])
 		GRF_WE	= 1;
 	end
 	
-	default: begin
-		NPCsel	= `x;
+	6'b101011: begin: sw
+		NPCsel	= 0;
 		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 0;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0000;
+	
+		DM_RE		= 0;
+	   DM_WE		= 1;
+		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= 0;
+	end
+	
+	6'b100011: begin: lw
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 0;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0000;
+	
+		DM_RE		= 1;
+	   DM_WE		= 0;
+		
+		A3sel		= 1;
+		WDsel		= 1;
+		GRF_WE	= 1;
+	end
+	
+	6'b000100: begin: beq
+		NPCsel	= 1;
+		NPCOp		= 0;
+		CMPOp		= 0;
 		ExtOp		= `x;
 		
 		ALUasel	= `x;
 	   ALUbsel	= `x;
-		ALUOp		= 4'bxxxx;
+		ALUOp		= `x;
 	
 		DM_RE		= `x;
 	   DM_WE		= `x;
@@ -139,6 +271,60 @@ case (IR[`Op])
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= `x;
+	end
+	
+	6'b000010: begin: j
+		NPCsel	= 1;
+		NPCOp		= 1;
+		CMPOp		= `x;
+		ExtOp		= `x;
+		
+		ALUasel	= `x;
+	   ALUbsel	= `x;
+		ALUOp		= `x;
+	
+		DM_RE		= `x;
+	   DM_WE		= `x;
+		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= `x;
+	end
+	
+	6'b000011: begin: jal
+		NPCsel	= 1;
+		NPCOp		= 1;
+		CMPOp		= `x;
+		ExtOp		= `x;
+		
+		ALUasel	= 1;
+	   ALUbsel	= 2;
+		ALUOp		= 4'b0000;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		
+		A3sel		= 3;
+		WDsel		= 0;
+		GRF_WE	= 1;
+	end
+	
+	default: begin
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= `x;
+		
+		ALUasel	= `x;
+	   ALUbsel	= `x;
+		ALUOp		= 4'bxxxx;
+	
+		DM_RE		= 0;
+	   DM_WE		= 0;
+		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= 0;
 	end
 endcase
 end

@@ -34,8 +34,6 @@ module stageF(
 	 
     );
 
-wire [31:0] Instr;
-
 im IM(.PC(PC), .Instr(IR_F));
 adder ADD4(.A(PC), .B(32'd4), .Out(PC4_F));
 adder ADD8(.A(PC4_F), .B(32'd4), .Out(PC8_F));
@@ -48,14 +46,14 @@ endmodule
 
 module stageD(
 	 
-	 input [31:0] GRF_A1,
-	 input [31:0] GRF_A2,
+	 input [4:0] GRF_A1,
+	 input [4:0] GRF_A2,
 	 output [31:0] GRF_RD1,
 	 output [31:0] GRF_RD2,
 	 
 	 input [31:0] CMP_D1,
 	 input [31:0] CMP_D2,
-	 output Zero,
+	 input [1:0] CMPOp,
 
 	 input [15:0] Ext_In,
 	 output [31:0] Ext_Out,
@@ -63,7 +61,7 @@ module stageD(
 	 
 	 input [31:0] NPC_PC4,
 	 input [25:0] NPC_Addr,
-	 input npcOp,
+	 input [1:0] npcOp,
 	 output [31:0] NPCOut,
 	 
 	 input clk,
@@ -71,17 +69,19 @@ module stageD(
 	 
 	 input [4:0] GRF_A3,
 	 input [31:0] GRF_WD,
-	 input GRF_WE
+	 input GRF_WE,
+	 
+	 input [31:0] PC
     );
 	 
 	 
 grf GRF(.RA1(GRF_A1), .RA2(GRF_A2), .WA(GRF_A3), .WD(GRF_WD), .RD1(GRF_RD1), .RD2(GRF_RD2), .Reset(reset), .clk(clk), .WE(GRF_WE), .PC(PC));
 
-cmp CMP(.A(CMP_D1), .B(CMP_D2), .Op(), .Zero(Zero));
+cmp CMP(.A(CMP_D1), .B(CMP_D2), .Op(CMPOp), .Zero(Jump));
 
 ext Ext(.In(Ext_In), .Out(Ext_Out), .Op(ExtOp));
 
-npc NPC(.PC4(NPC_PC4), .Add(NPC_Addr), .npcOp(npcOp), .NPC(NPCOut));
+npc NPC(.PC(NPC_PC4), .Add(NPC_Addr), .npcOp(npcOp), .Jump(Jump), .NPC(NPCOut));
 
 endmodule
 
@@ -130,7 +130,7 @@ endmodule
 
 
 //
-
+/*
 module stageW(
 	 
 
@@ -146,3 +146,4 @@ module stageW(
 endmodule
 
 
+*/
