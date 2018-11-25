@@ -93,7 +93,8 @@ wire [1:0] DMOp_D, DMOp_E, DMOp_M, DMOp_W;
 //
 
 forward Forward(
-	.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), .IR_W(IR_W), .RWE_M(GRF_WE_M), .A3sel_M(A3sel_M), .RWE_W(GRF_WE_W), .A3sel_W(A3sel_W),
+	.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), .IR_W(IR_W), 
+	.RWE_E(GRF_WE_E), .A3sel_E(A3sel_E), .RWE_M(GRF_WE_M), .A3sel_M(A3sel_M), .RWE_W(GRF_WE_W), .A3sel_W(A3sel_W),
 	.ForwardRS_D(ForwardRS_D), .ForwardRT_D(ForwardRT_D), .ForwardRS_E(ForwardRS_E),
 	.ForwardRT_E(ForwardRT_E), .ForwardRT_M(ForwardRT_M)
 );

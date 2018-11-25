@@ -56,8 +56,10 @@ always @(*) begin
 	rd_jr = (GRF_WE_E && A3sel_E == 2'b00 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_E[`Rd]) );
 	rt_bj = (GRF_WE_E && A3sel_E == 2'b01 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_E[`Rt]) || (IR_D[`Rt] == IR_E[`Rt]));
 	rt_jr = (GRF_WE_E && A3sel_E == 2'b01 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == IR_E[`Rt]) );
-	jal_bj = (GRF_WE_E && A3sel_E == 2'b11 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == 5'd31) || (IR_D[`Rt] == 5'd31));
-	jal_jr = (GRF_WE_E && A3sel_E == 2'b11 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == 5'd31) );
+	//jal_bj = (GRF_WE_E && A3sel_E == 2'b11 && NPCsel_D == 2'b01) && ((IR_D[`Rs] == 5'd31) || (IR_D[`Rt] == 5'd31));
+	//jal_jr = (GRF_WE_E && A3sel_E == 2'b11 && NPCsel_D == 2'b10) && ((IR_D[`Rs] == 5'd31) );
+	jal_bj = 0;  // forward
+	jal_jr = 0;  // forward
 	
 	//M
 	lw_b_m = (DM_RE_M && NPCsel_D == 2'b01) && ((IR_D[`Rs] == IR_M[`Rt]) || (IR_D[`Rt] == IR_M[`Rt]));
@@ -66,7 +68,7 @@ always @(*) begin
 	pause = (lw_r === 1 || lw_b === 1 || lw_o === 1 || 
 			  rd_bj === 1 || rd_jr === 1 | rt_bj === 1 || 
 			  rt_jr === 1 || lw_b_m === 1 || lw_j_m === 1)
-			  
+		&& !(IR_D[`Op] == 6'b000000 && IR_D[`Func] == 6'b000010)  // j 
 		  
 			  ;
 end

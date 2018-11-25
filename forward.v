@@ -35,6 +35,9 @@ module forward(
 	 input [31:0] IR_M,
 	 input [31:0] IR_W,
 	 
+	 input RWE_E,
+	 input [1:0] A3sel_E,
+	 
 	 input RWE_M,
 	 input [1:0] A3sel_M,
 	 
@@ -61,9 +64,17 @@ initial begin
 	ForwardRT_M = 0;
 end
 
-reg [4:0] A3_M, A3_W;
+reg [4:0] A3_E, A3_M, A3_W;
 
 always @(*) begin
+	case (A3sel_E)
+		2'b00: A3_E = IR_E[`Rd];
+		2'b01: A3_E = IR_E[`Rt];
+		2'b10: A3_E = IR_E[`Rs];
+		2'b11: A3_E = 32'd31;
+		default: A3_E = 32'bx;
+	endcase
+	
 	case (A3sel_M)
 		2'b00: A3_M = IR_M[`Rd];
 		2'b01: A3_M = IR_M[`Rt];
@@ -85,6 +96,8 @@ always @(*) begin
 		ForwardRS_D = 1;
 	end else if ((IR_D[`Rs] == A3_W) && RWE_W) begin
 		ForwardRS_D = 2;
+	end else if ((IR_D[`Rs] == A3_E) && RWE_E) begin
+		ForwardRS_D = 3;
 	end else begin
 		ForwardRS_D = 0;
 	end
@@ -95,6 +108,8 @@ always @(*) begin
 		ForwardRT_D = 1;
 	end else if ((IR_D[`Rt] == A3_W) && RWE_W) begin
 		ForwardRT_D = 2;
+	end else if ((IR_D[`Rt] == A3_E) && RWE_E) begin
+		ForwardRT_D = 3;
 	end else begin
 		ForwardRT_D = 0;
 	end
