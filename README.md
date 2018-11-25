@@ -1,5 +1,8 @@
 # BUAA_MIPS
 BUAA Computer Architecture course
 
-pipeline CPU / MIPS
-in BUAA
+pipeline MIPS CPU@Beihang University
+
+
+**NEVER COPY THE CODE, OTHERWISE YOU WILL FAIL THE TEST BECAUSE OF SIMILARITY TEST!**
+

@@ -132,6 +132,25 @@ case (IR[`Op])
 				GRF_WE	= 1;
 			end
 			
+			6'b100100: begin: and_
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0010;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				DMOp		= `x;
+				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
 			6'b001001: begin: jalr
 				NPCsel	= 2;
 				NPCOp		= `x;
