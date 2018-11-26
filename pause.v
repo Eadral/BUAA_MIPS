@@ -73,7 +73,7 @@ always @(*) begin
 			  rt_jr === 1 || lw_b_m === 1 || lw_j_m === 1)
 		&& !(IR_D[`Op] == 6'b000000 && IR_D[`Func] == 6'b000010)  // j 
 		
-		&& !(IR_E == 32'b0) // stalling
+		&& !(IR_M == 32'b0) // stalling
 			  ;
 end
 
