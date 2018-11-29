@@ -32,8 +32,9 @@
 module mips(
     input clk,
     input reset
+	 //,output [31:0] GRF_WD, MUX_WD_Out
     );
-
+wire [31:0] GRF_WD, MUX_WD_Out;
 
 wire [1:0] ForwardRS_D, ForwardRT_D, ForwardRS_E, ForwardRT_E, ForwardRT_M;
 wire [31:0] IR_D, IR_E, IR_M, IR_W;
@@ -53,11 +54,11 @@ wire [3:0] ALUOp_D, CMPOp_D;
 wire DM_RE_D, DM_WE_D, GRF_WE_D;
 wire [1:0] A3sel_D, WDsel_D;
 wire [31:0] GRF_RD1, GRF_RD2, Ext_Out, PC4_W/*, NPC_Out*/;
-wire [31:0] GRF_WD;
+
 wire [4:0] GRF_A3;
 wire GRF_WE;
 wire [31:0] MF_RT_D_Out;
-wire [31:0] ALUOut_M, MUX_WD_Out;
+wire [31:0] ALUOut_M;
 wire [31:0] /*IR_E,*/ PC4_E, PC8_E, Rs_E, Rt_E, Ext_E;
 
 wire [1:0] ExtOp_E, NPCOp_E;

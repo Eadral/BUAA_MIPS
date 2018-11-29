@@ -38,9 +38,9 @@ end
 
 always @(posedge clk) begin
 	if (reset) begin
-		IR_D = 32'b0;
-		PC4_D = 32'b0;
-		PC8_D = 32'b0;
+		IR_D <= 32'b0;
+		PC4_D <= 32'b0;
+		PC8_D <= 32'b0;
 	end else
 	if (!stall) begin
 		IR_D  <= IR_F ;
@@ -85,12 +85,12 @@ end
 
 always @(posedge clk) begin
 	if (reset) begin
-		IR_E	= 32'b0; 
-		PC4_E	= 32'b0; 
-		PC8_E	= 32'b0; 
-		Rs_E	= 32'b0; 
-		Rt_E	= 32'b0; 
-		Ext_E	= 32'b0; 
+		IR_E	<= 32'b0; 
+		PC4_E	<= 32'b0; 
+		PC8_E	<= 32'b0; 
+		Rs_E	<= 32'b0; 
+		Rt_E	<= 32'b0; 
+		Ext_E	<= 32'b0; 
 	end else
 	if (clr) begin
 		IR_E	<= 32'b0; 
@@ -143,12 +143,12 @@ end
 
 always @(posedge clk) begin
 	if (reset) begin
-		IR_M	= 32'b0;
-		PC4_M = 32'b0;
-		PC8_M = 32'b0;
-		ALUOut_M = 32'b0;
-		XALUOut_M = 32'b0;
-		Rt_M = 32'b0;
+		IR_M	<= 32'b0;
+		PC4_M <= 32'b0;
+		PC8_M <= 32'b0;
+		ALUOut_M <= 32'b0;
+		XALUOut_M <= 32'b0;
+		Rt_M <= 32'b0;
 	end else begin
 		IR_M	<= 		IR_E;
 		PC4_M <=       PC4_E;
@@ -194,12 +194,12 @@ end
 
 always @(posedge clk) begin
 	if (reset) begin
-		IR_W		= 32'b0;
-		PC4_W		= 32'b0;
-		PC8_W		= 32'b0;
-		ALUOut_W	= 32'b0;
-		XALUOut_W= 32'b0;
-		DM_W		= 32'b0;
+		IR_W		<= 32'b0;
+		PC4_W		<= 32'b0;
+		PC8_W		<= 32'b0;
+		ALUOut_W	<= 32'b0;
+		XALUOut_W<= 32'b0;
+		DM_W		<= 32'b0;
 	end else begin
 		IR_W		<= IR_M;
 		PC4_W		<= PC4_M;

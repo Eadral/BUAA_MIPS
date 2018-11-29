@@ -38,10 +38,15 @@ module mips_tb;
 	initial begin
 		// Initialize Inputs
 		clk = 0;
-		reset = 0;
+		reset = 1;
 
 		// Wait 100 ns for global reset to finish
-		#5;
+		#5 clk = ~clk;
+		#5 clk = ~clk;
+		#5 clk = ~clk;
+		reset = 0;
+		#5 clk = ~clk;
+		
 	
 		for (i = 0; i < 200; i = i + 1)
 			#5 clk = ~clk;

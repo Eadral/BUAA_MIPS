@@ -40,7 +40,7 @@ always @(posedge clk) begin
 	if (Reset) begin
 		for (i = 0; i < 1024; i = i + 1)
 			dm[i] <= 0;
-	end if (WE) begin
+	end else if (WE) begin
 		$display("%d@%h: *%h <= %h", $time, PC, A, WD);
 		dm[A[11:2]] <= WD;
 	end
