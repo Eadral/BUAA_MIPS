@@ -26,6 +26,9 @@ module npc(
     output reg [31:0] NPC
     );
 
+wire [31:0] PC4;
+assign PC4 = PC + 4;
+
 always @(*) begin
 case (npcOp)
 	0: begin
@@ -34,7 +37,7 @@ case (npcOp)
 		else
 			NPC = PC + 8;
 	end
-	1: NPC = {PC[31:28], Add, 2'b00};
+	1: NPC = {PC4[31:28], Add, 2'b00};
 endcase
 end
 

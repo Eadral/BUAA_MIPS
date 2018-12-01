@@ -272,7 +272,43 @@ case (IR[`Op])
 				GRF_WE	= 1;
 			end
 			
+			6'b100000: begin: add
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0000;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
 			6'b100011: begin: subu
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= 0;
+				ALUOp		= 4'b0001;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
+			6'b100010: begin: sub
 				NPCsel	= 0;
 				NPCOp		= `x;
 				CMPOp		= `x;
@@ -890,7 +926,7 @@ case (IR[`Op])
 		GRF_WE	= 1;
 	end
 	
-	6'b001000: begin: addi    // no exception!
+	6'b001000: begin: addi
 		NPCsel	= 0;
 		NPCOp		= `x;
 		CMPOp		= `x;
