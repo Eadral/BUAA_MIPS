@@ -36,7 +36,7 @@ module pause(
 	 
 	 input GRF_WE_E, GRF_WE_M, GRF_WE_W,
 	 
-	 input [1:0] A3sel_E, A3sel_M, A3sel_W,
+	 input [4:0] A3_E, A3_M, A3_W,
 	 
 	 input DM_WE_D,
 	 input [1:0] WDsel_E,
@@ -51,34 +51,6 @@ module pause(
 	 
     output pause
     );
-
-reg [4:0] A3_E, A3_M, A3_W;
-
-always @(*) begin
-	case (A3sel_E)
-		2'b00: A3_E = IR_E[`Rd];
-		2'b01: A3_E = IR_E[`Rt];
-		2'b10: A3_E = IR_E[`Rs];
-		2'b11: A3_E = 32'd31;
-		default: A3_E = 32'bx;
-	endcase
-	
-	case (A3sel_M)
-		2'b00: A3_M = IR_M[`Rd];
-		2'b01: A3_M = IR_M[`Rt];
-		2'b10: A3_M = IR_M[`Rs];
-		2'b11: A3_M = 32'd31;
-		default: A3_M = 32'bx;
-	endcase
-	
-	case (A3sel_W)
-		2'b00: A3_W = IR_W[`Rd];
-		2'b01: A3_W = IR_W[`Rt];
-		2'b10: A3_W = IR_W[`Rs];
-		2'b11: A3_W = 32'd31;
-		default: A3_W = 32'bx;
-	endcase
-end
 
 wire xalu = Busy && XALUOp_D != 0;
 

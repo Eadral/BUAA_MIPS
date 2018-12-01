@@ -39,7 +39,8 @@ wire [31:0] GRF_WD, MUX_WD_Out;
 wire [1:0] ForwardRS_D, ForwardRT_D, ForwardRS_E, ForwardRT_E, ForwardRT_M;
 wire [31:0] IR_D, IR_E, IR_M, IR_W;
 wire GRF_WE_E, GRF_WE_M, GRF_WE_W;
-wire [1:0] A3sel_M, A3sel_W, A3sel_E, WDsel_E, WDsel_M, NPCsel_D;
+wire [2:0] A3sel_D, A3sel_M, A3sel_W, A3sel_E;
+wire [1:0] WDsel_E, WDsel_M, NPCsel_D;
 wire [31:0] NPC;
 wire Jump;
 wire [31:0] PC4_F, NPC_Out, MF_RS_D_Out;
@@ -52,7 +53,7 @@ wire [1:0] ExtOp_D, NPCOp_D;
 wire [1:0] ALUasel_D, ALUbsel_D;
 wire [3:0] ALUOp_D, CMPOp_D;
 wire DM_RE_D, DM_WE_D, GRF_WE_D;
-wire [1:0] A3sel_D, WDsel_D;
+wire [1:0] WDsel_D;
 wire [31:0] GRF_RD1, GRF_RD2, Ext_Out, PC4_W/*, NPC_Out*/;
 
 wire [4:0] GRF_A3;
@@ -87,7 +88,7 @@ wire [3:0] ALUOp_W, CMPOp_W;
 wire DM_RE_W, DM_WE_W/*, GRF_WE_W*/;
 wire [1:0] /*A3sel_W,*/ WDsel_W;
 
-wire [4:0] MUX_A3_Out;
+wire [4:0] A3_E, A3_M, A3_W;
 //wire [31:0] MUX_WD_Out;
 wire [2:0] DMOOp_D, DMOOp_E, DMOOp_M, DMOOp_W;
 wire [2:0] DMIOp_D, DMIOp_E, DMIOp_M, DMIOp_W;
@@ -104,15 +105,16 @@ wire [1:0] Tnew_D, Tnew_E, Tnew_M, Tnew_W, Tuse_Rs_D, Tuse_Rt_D;
 
 forward Forward(
 	.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), .IR_W(IR_W), 
-	.RWE_E(GRF_WE_E), .A3sel_E(A3sel_E), .RWE_M(GRF_WE_M), .A3sel_M(A3sel_M), .RWE_W(GRF_WE_W), .A3sel_W(A3sel_W),
+	.RWE_E(GRF_WE_E), .RWE_M(GRF_WE_M), .RWE_W(GRF_WE_W),
+	.A3_E(A3_E), .A3_M(A3_M), .A3_W(A3_W),
 	.ForwardRS_D(ForwardRS_D), .ForwardRT_D(ForwardRT_D), .ForwardRS_E(ForwardRS_E),
 	.ForwardRT_E(ForwardRT_E), .ForwardRT_M(ForwardRT_M),
-	.GRF_A3(GRF_A3), .Forward_RD1(Forward_RD1), .Forward_RD2(Forward_RD2)
+	.Forward_RD1(Forward_RD1), .Forward_RD2(Forward_RD2)
 );
 
 pause Pause(.Tuse_Rs_D(Tuse_Rs_D), .Tuse_Rt_D(Tuse_Rt_D), .Tnew_E(Tnew_E), .Tnew_M(Tnew_M), .Tnew_W(Tnew_W),
 				.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), .IR_W(IR_W),
-				.A3sel_E(A3sel_E), .A3sel_M(A3sel_M), .A3sel_W(A3sel_W),
+				.A3_E(A3_E), .A3_M(A3_M), .A3_W(A3_W),
 				.GRF_WE_E(GRF_WE_E), .GRF_WE_M(GRF_WE_M), .GRF_WE_W(GRF_WE_W), 
 				.WDsel_E(WDsel_E), .WDsel_M(WDsel_M), 
 				.DM_WE_D(DM_WE_D), .DM_RE_E(DM_RE_E), .DM_RE_M(DM_RE_M),
@@ -192,11 +194,16 @@ stageE E(.ALUa(ALUa), .ALUb(ALUb), .ALUop(ALUOp_E), .ALU_Out(ALU_Out),
 			.clk(clk), .reset(reset)
 );
 
+mux8 #(5) MUX_A3(.s(A3sel_E), .out(A3_E), 
+					  .d0(IR_E[`Rd]), .d1(IR_E[`Rt]), .d2(IR_E[`Rs]), .d3(5'd31),
+					  .d4(5'bx), .d5(5'bx), .d6(5'bx), .d7(5'bx)
+					  );
+
 // M
 
 
-E_M_reg E_M(.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .ALUOut_E(ALU_Out), .XALUOut_E(), .Rt_E(MF_RT_E_Out), .clk(clk), .reset(reset), .Tnew_E(Tnew_E),
-				.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .Rt_M(Rt_M), .Tnew_M(Tnew_M));
+E_M_reg E_M(.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .ALUOut_E(ALU_Out), .XALUOut_E(), .Rt_E(MF_RT_E_Out), .clk(clk), .reset(reset), .A3_E(A3_E), .Tnew_E(Tnew_E),
+				.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .Rt_M(Rt_M), .A3_M(A3_M), .Tnew_M(Tnew_M));
 
 
 
@@ -217,8 +224,8 @@ stageM M(.DM_A(ALUOut_M), .DM_WD(MF_RT_M_Out), .DM_Out(DM_Out),
 // W
 
 
-M_W_reg M_W(.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .DM_M(DM_Out), .clk(clk), .reset(reset),  .Tnew_M(Tnew_M),
-				.IR_W(IR_W), .PC4_W(PC4_W), .PC8_W(PC8_W), .ALUOut_W(ALUOut_W), .XALUOut_W(XALUOut_W), .DM_W(DM_W), .Tnew_W(Tnew_W));
+M_W_reg M_W(.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .DM_M(DM_Out), .clk(clk), .reset(reset), .A3_M(A3_M), .Tnew_M(Tnew_M),
+				.IR_W(IR_W), .PC4_W(PC4_W), .PC8_W(PC8_W), .ALUOut_W(ALUOut_W), .XALUOut_W(XALUOut_W), .DM_W(DM_W), .A3_W(A3_W), .Tnew_W(Tnew_W));
 
 
 
@@ -230,10 +237,10 @@ control ControlW(.IR(IR_W),
 
 dmOutput DMOutput(.A(ALUOut_W[1:0]), .DMOOp(DMOOp_W), .RD(DM_W), .DMOut(DMOut));
 
-mux4 #(5) MUX_A3(.s(A3sel_W), .out(MUX_A3_Out), .d0(IR_W[`Rd]), .d1(IR_W[`Rt]), .d2(IR_W[`Rs]), .d3(5'd31));
+//mux4 #(5) MUX_A3(.s(A3sel_W), .out(MUX_A3_Out), .d0(IR_W[`Rd]), .d1(IR_W[`Rt]), .d2(IR_W[`Rs]), .d3(5'd31));
 mux4 MUX_WD(.s(WDsel_W), .out(MUX_WD_Out), .d0(ALUOut_W), .d1(DMOut), .d2(PC8_W), .d3(32'bx));
 
-assign GRF_A3 = MUX_A3_Out;
+assign GRF_A3 = A3_W;
 assign GRF_WD = MUX_WD_Out;
 
 endmodule

@@ -36,15 +36,9 @@ module forward(
 	 input [31:0] IR_W,
 	 
 	 input RWE_E,
-	 input [1:0] A3sel_E,
-	 
 	 input RWE_M,
-	 input [1:0] A3sel_M,
-	 
 	 input RWE_W,
-	 input [1:0] A3sel_W,
-	 
-	 input [4:0] GRF_A3,
+	 input [4:0] A3_E, A3_M, A3_W,
 	 
 	 output reg [1:0] ForwardRS_D,
 	 output reg [1:0] ForwardRT_D,
@@ -68,41 +62,16 @@ initial begin
 	ForwardRT_M = 0;
 end
 
-reg [4:0] A3_E, A3_M, A3_W;
-
 always @(*) begin
-	case (A3sel_E)
-		2'b00: A3_E = IR_E[`Rd];
-		2'b01: A3_E = IR_E[`Rt];
-		2'b10: A3_E = IR_E[`Rs];
-		2'b11: A3_E = 32'd31;
-		default: A3_E = 32'bx;
-	endcase
-	
-	case (A3sel_M)
-		2'b00: A3_M = IR_M[`Rd];
-		2'b01: A3_M = IR_M[`Rt];
-		2'b10: A3_M = IR_M[`Rs];
-		2'b11: A3_M = 32'd31;
-		default: A3_M = 32'bx;
-	endcase
-	
-	case (A3sel_W)
-		2'b00: A3_W = IR_W[`Rd];
-		2'b01: A3_W = IR_W[`Rt];
-		2'b10: A3_W = IR_W[`Rs];
-		2'b11: A3_W = 32'd31;
-		default: A3_W = 32'bx;
-	endcase
 	
 	// Forward_RD1
-	if ((IR_D[`Rs] == GRF_A3) && (GRF_A3 != 0))  
+	if ((IR_D[`Rs] == A3_W) && (A3_W != 0))  
 		Forward_RD1 = 1;
 	else 
 		Forward_RD1 = 0;
 		
 	// Forward_RD2
-	if ((IR_D[`Rt] == GRF_A3) && (GRF_A3 != 0))  
+	if ((IR_D[`Rt] == A3_W) && (A3_W != 0))  
 		Forward_RD2 = 1;
 	else 
 		Forward_RD2 = 0;
@@ -153,7 +122,7 @@ always @(*) begin
 	//
 	
 	// ForwardRT_M
-	if ((A3_W != 0) && (IR_M[`Rt] == A3_M) && RWE_W) begin
+	if ((A3_W != 0) && (IR_M[`Rt] == A3_W) && RWE_W) begin
 		ForwardRT_M = 1;
 	end else begin
 		ForwardRT_M = 0;

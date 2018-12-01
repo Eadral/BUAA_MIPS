@@ -86,7 +86,7 @@ module control(
 	 output DM_WE,
 	 output [2:0] DMOOp, DMIOp,
 	 
-	 output reg [1:0] A3sel,
+	 output reg [2:0] A3sel,
 	 output reg [1:0] WDsel,
 	 output reg GRF_WE,
 	 

@@ -131,6 +131,7 @@ module E_M_reg(
     input [31:0] ALUOut_E,
     input [31:0] XALUOut_E,
     input [31:0] Rt_E,
+	 input [4:0] A3_E,
 	 input [1:0] Tnew_E,
 	 output reg [31:0] IR_M,
 	 output reg [31:0] PC4_M,
@@ -138,6 +139,7 @@ module E_M_reg(
 	 output reg [31:0] ALUOut_M,
 	 output reg [31:0] XALUOut_M,
 	 output reg [31:0] Rt_M,
+	 output reg [4:0] A3_M,
 	 output reg [1:0] Tnew_M,
 	 input clk,
 	 input reset
@@ -151,6 +153,7 @@ initial begin
 	XALUOut_M = 32'b0;
    Rt_M = 32'b0;
 	Tnew_M = 0;
+	A3_M = 0;
 end
 
 always @(posedge clk) begin
@@ -162,6 +165,7 @@ always @(posedge clk) begin
 		XALUOut_M <= 32'b0;
 		Rt_M <= 32'b0;
 		Tnew_M <= 0;
+		A3_M <= 0;
 	end else begin
 		IR_M	<= 		IR_E;
 		PC4_M <=       PC4_E;
@@ -169,6 +173,7 @@ always @(posedge clk) begin
 		ALUOut_M <=    ALUOut_E;
 		XALUOut_M <=   XALUOut_E;
 		Rt_M <=        Rt_E;
+		A3_M <=	A3_E;
 		if (Tnew_E > 0)
 			Tnew_M <= Tnew_E - 1;
 		else 
@@ -190,6 +195,7 @@ module M_W_reg(
     input [31:0] ALUOut_M,
     input [31:0] XALUOut_M,
     input [31:0] DM_M,
+	 input [4:0] A3_M,
 	 input [1:0] Tnew_M,
 	 output reg [31:0] IR_W,
 	 output reg [31:0] PC4_W,
@@ -197,6 +203,7 @@ module M_W_reg(
 	 output reg [31:0] ALUOut_W,
 	 output reg [31:0] XALUOut_W,
 	 output reg [31:0] DM_W,
+	 output reg [4:0] A3_W,
 	 output reg [1:0] Tnew_W,
 	 input clk,
 	 input reset
@@ -210,6 +217,7 @@ initial begin
    XALUOut_W= 32'b0;
    DM_W		= 32'b0;
 	Tnew_W	= 0;
+	A3_W		= 0;
 end
 
 always @(posedge clk) begin
@@ -221,6 +229,7 @@ always @(posedge clk) begin
 		XALUOut_W<= 32'b0;
 		DM_W		<= 32'b0;
 		Tnew_W	<= 0;
+		A3_W		<= 0;
 	end else begin
 		IR_W		<= IR_M;
 		PC4_W		<= PC4_M;
@@ -228,6 +237,7 @@ always @(posedge clk) begin
 		ALUOut_W	<= ALUOut_M;
 		XALUOut_W<= XALUOut_M;
 		DM_W		<= DM_M;
+		A3_W 		<= A3_M;
 		if (Tnew_M > 0)
 			Tnew_W <= Tnew_M - 1;
 		else 
