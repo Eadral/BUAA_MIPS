@@ -41,6 +41,8 @@ case (Op)
 	4'b1000: Out = A < B ? 1 : 0;
 	4'b1001: Out = ~(A | B);
 	4'b1010: Out = A ^ B;
+	4'b1011: Out = A;
+	4'b1100: Out = B;
 	
 	default: Out = 32'bx;
 endcase

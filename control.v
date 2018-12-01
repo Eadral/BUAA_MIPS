@@ -42,6 +42,15 @@
 `define lh 	6'b100001
 `define lhu	6'b100101
 
+`define mult	6'b011000
+`define multu	6'b011001
+`define div 	6'b011010
+`define divu	6'b011011
+`define mthi	6'b010001
+`define mtlo	6'b010011
+`define mfhi	6'b010000
+`define mflo	6'b010010
+
 module control(
 	 input [31:0] IR,
 	 
@@ -54,6 +63,7 @@ module control(
 	 output reg [1:0] ALUasel,
 	 output reg [1:0] ALUbsel,
 	 output reg [3:0] ALUOp,
+	 output [3:0] XALUOp,
 	 
 	 output reg DM_RE,
 	 output reg DM_WE,
@@ -82,10 +92,168 @@ assign DMIOp = IR[`Op] == `lw ? 0 :
 					IR[`Op] == `sh ? 2 :
 					`x;
 
+assign XALUOp = IR[`Op] == `R ? (
+						// R
+						IR[`Func] == `mult	? 1 :
+						IR[`Func] == `multu	? 2 :
+						IR[`Func] == `div 	? 7 :
+						IR[`Func] == `divu	? 8 :
+						IR[`Func] == `mthi	? 3 :
+						IR[`Func] == `mtlo	? 4 :
+						IR[`Func] == `mfhi	? 5 :
+						IR[`Func] == `mflo	? 6 :
+						`x
+					 ) : 
+					 `x;
+
 always @(*) begin
 case (IR[`Op])
 	6'b000000: begin
 		case (IR[`Func]) 
+			`mult: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end		
+			
+			`multu: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end		
+			
+			`div: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end		
+			
+			`divu: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end		
+			
+			`mthi: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end		
+			
+			`mtlo: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= `x;
+				ALUOp		= `x;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= `x;
+				WDsel		= `x;
+				GRF_WE	= 0;
+			end	
+
+			`mfhi: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 2;
+				ALUbsel	= `x;
+				ALUOp		= 4'b1011;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end		
+			
+			`mflo: begin
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 2;
+				ALUbsel	= `x;
+				ALUOp		= 4'b1011;
+			
+				DM_RE		= 0;
+				DM_WE		= 0;
+				 				
+				A3sel		= 0;
+				WDsel		= 0;
+				GRF_WE	= 1;
+			end
+			
 			6'b100001: begin: addu
 				NPCsel	= 0;
 				NPCOp		= `x;
@@ -164,7 +332,7 @@ case (IR[`Op])
 				CMPOp		= `x;
 				ExtOp		= `x;
 				
-				ALUasel	= 2;
+				ALUasel	= 1;
 				ALUbsel	= 0;
 				ALUOp		= 4'b0110;
 			
@@ -182,7 +350,7 @@ case (IR[`Op])
 				CMPOp		= `x;
 				ExtOp		= `x;
 				
-				ALUasel	= 2;
+				ALUasel	= 1;
 				ALUbsel	= 0;
 				ALUOp		= 4'b0101;
 			
@@ -200,7 +368,7 @@ case (IR[`Op])
 				CMPOp		= `x;
 				ExtOp		= `x;
 				
-				ALUasel	= 2;
+				ALUasel	= 1;
 				ALUbsel	= 0;
 				ALUOp		= 4'b0100;
 			
@@ -344,9 +512,9 @@ case (IR[`Op])
 				CMPOp		= `x;
 				ExtOp		= `x;
 				
-				ALUasel	= 1;
+				ALUasel	= `x;
 				ALUbsel	= 2;
-				ALUOp		= 4'b0000;
+				ALUOp		= 4'b1100;
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
@@ -692,9 +860,9 @@ case (IR[`Op])
 		CMPOp		= `x;
 		ExtOp		= 2;
 		
-		ALUasel	= 1;
+		ALUasel	= `x;
 	   ALUbsel	= 1;
-		ALUOp		= 4'b0000;
+		ALUOp		= 4'b1100;
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
@@ -837,9 +1005,9 @@ case (IR[`Op])
 		CMPOp		= `x;
 		ExtOp		= `x;
 		
-		ALUasel	= 1;
+		ALUasel	= `x;
 	   ALUbsel	= 2;
-		ALUOp		= 4'b0000;
+		ALUOp		= 4'b1100;
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;

@@ -93,13 +93,21 @@ module stageE(
 	 input [31:0] ALUa,
 	 input [31:0] ALUb,
 	 input [3:0] ALUop,
-	 output [31:0] ALU_Out
+	 output [31:0] ALU_Out,
+	 
+	 input [31:0] XALUa, XALUb,
+	 input [3:0] XALUOp,
+	 output [31:0] XALU_Out,
+	 output Busy,
+	 
+	 input clk, reset
 	
     );
 
 
 alu ALU(.A(ALUa), .B(ALUb), .Op(ALUop), .Out(ALU_Out), .Zero());
 
+xalu XALU(.D1(XALUa), .D2(XALUb), .XALUOp(XALUOp), .Start(XALUOp != 0), .XALU_Out(XALU_Out), .Busy(Busy), .clk(clk), .reset(reset));
 
 endmodule
 
