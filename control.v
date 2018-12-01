@@ -30,6 +30,18 @@
 
 `define x 32'bx
 
+// macro
+`define R 6'b000000
+
+`define lw 	6'b100011
+`define lb 	6'b100000
+`define lbu 6'b100100
+`define sw 	6'b101011
+`define sb 	6'b101000
+`define sh 	6'b101001
+`define lh 	6'b100001
+`define lhu	6'b100101
+
 module control(
 	 input [31:0] IR,
 	 
@@ -45,12 +57,30 @@ module control(
 	 
 	 output reg DM_RE,
 	 output reg DM_WE,
-	 output reg [1:0] DMOp,
+	 output [2:0] DMOOp, DMIOp,
 	 
 	 output reg [1:0] A3sel,
 	 output reg [1:0] WDsel,
 	 output reg GRF_WE
     );
+
+assign DMOOp = IR[`Op] == `lw ? 0 :
+					IR[`Op] == `lb ? 2 :
+					IR[`Op] == `lbu ? 1 :
+					IR[`Op] == `sw ? 0 :
+					IR[`Op] == `sb ? 0 :
+					IR[`Op] == `lh ? 4 :
+					IR[`Op] == `lhu ? 3 :
+					`x ;
+					
+
+assign DMIOp = IR[`Op] == `lw ? 0 :
+					IR[`Op] == `lb ? 0 :
+					IR[`Op] == `lbu ? 0 :
+					IR[`Op] == `sw ? 0 :
+					IR[`Op] == `sb ? 1 :
+					IR[`Op] == `sh ? 2 :
+					`x;
 
 always @(*) begin
 case (IR[`Op])
@@ -68,8 +98,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -87,8 +116,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -106,8 +134,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -125,8 +152,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -144,8 +170,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -163,8 +188,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -182,8 +206,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -201,8 +224,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -220,8 +242,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -239,8 +260,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -258,8 +278,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -277,8 +296,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -296,8 +314,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -315,8 +332,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -334,8 +350,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
@@ -353,8 +368,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
@@ -372,8 +386,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
@@ -395,8 +408,7 @@ case (IR[`Op])
 			
 				DM_RE		= `x;
 				DM_WE		= `x;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= `x;
@@ -414,8 +426,7 @@ case (IR[`Op])
 			
 				DM_RE		= `x;
 				DM_WE		= `x;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= `x;
@@ -433,8 +444,7 @@ case (IR[`Op])
 			
 				DM_RE		= 0;
 				DM_WE		= 0;
-				DMOp		= `x;
-				
+				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
@@ -455,7 +465,6 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 1;
-		DMOp		= 0;
 		
 		A3sel		= `x;
 		WDsel		= `x;
@@ -474,7 +483,24 @@ case (IR[`Op])
 	
 		DM_RE		= 1;
 	   DM_WE		= 1;
-		DMOp		= 1;
+		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= 0;
+	end
+	
+	6'b101001: begin: sh
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 0;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0000;
+	
+		DM_RE		= 1;
+	   DM_WE		= 1;
 		
 		A3sel		= `x;
 		WDsel		= `x;
@@ -493,7 +519,6 @@ case (IR[`Op])
 	
 		DM_RE		= 1;
 	   DM_WE		= 0;
-		DMOp		= 0;
 		
 		A3sel		= 1;
 		WDsel		= 1;
@@ -512,7 +537,6 @@ case (IR[`Op])
 	
 		DM_RE		= 1;
 	   DM_WE		= 0;
-		DMOp		= 2;
 		
 		A3sel		= 1;
 		WDsel		= 1;
@@ -531,13 +555,47 @@ case (IR[`Op])
 	
 		DM_RE		= 1;
 	   DM_WE		= 0;
-		DMOp		= 3;
 		
 		A3sel		= 1;
 		WDsel		= 1;
 		GRF_WE	= 1;
 	end
 	
+	`lh: begin: lh
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 0;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0000;
+	
+		DM_RE		= 1;
+	   DM_WE		= 0;
+		
+		A3sel		= 1;
+		WDsel		= 1;
+		GRF_WE	= 1;
+	end
+	
+	`lhu: begin: lhu
+		NPCsel	= 0;
+		NPCOp		= `x;
+		CMPOp		= `x;
+		ExtOp		= 0;
+		
+		ALUasel	= 0;
+	   ALUbsel	= 1;
+		ALUOp		= 4'b0000;
+	
+		DM_RE		= 1;
+	   DM_WE		= 0;
+		
+		A3sel		= 1;
+		WDsel		= 1;
+		GRF_WE	= 1;
+	end
 	6'b001010: begin: slti
 		NPCsel	= 0;
 		NPCOp		= `x;
@@ -550,8 +608,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -569,8 +626,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -588,8 +644,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -607,8 +662,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -626,8 +680,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -645,8 +698,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -664,8 +716,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -683,8 +734,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -703,8 +753,7 @@ case (IR[`Op])
 	
 		DM_RE		= `x;
 	   DM_WE		= `x;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= `x;
@@ -722,8 +771,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
@@ -741,8 +789,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
@@ -760,8 +807,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
@@ -779,8 +825,7 @@ case (IR[`Op])
 	
 		DM_RE		= `x;
 	   DM_WE		= `x;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= `x;
@@ -798,8 +843,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= 3;
 		WDsel		= 0;
 		GRF_WE	= 1;
@@ -817,8 +861,7 @@ case (IR[`Op])
 	
 		DM_RE		= 0;
 	   DM_WE		= 0;
-		DMOp		= `x;
-		
+		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;

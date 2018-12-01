@@ -18,13 +18,13 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module im(
+module im #(parameter SIZE=4096)(
     input [31:0] PC,
     output [31:0] Instr
     );
 
 
-reg [31:0] im [0:1023];
+reg [31:0] im [0:SIZE-1];
 assign Instr = im[PC[11:2]];
 
 initial begin

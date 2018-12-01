@@ -89,10 +89,11 @@ wire [1:0] /*A3sel_W,*/ WDsel_W;
 
 wire [4:0] MUX_A3_Out;
 //wire [31:0] MUX_WD_Out;
-wire [1:0] DMOp_D, DMOp_E, DMOp_M, DMOp_W;
+wire [2:0] DMOOp_D, DMOOp_E, DMOOp_M, DMOOp_W;
+wire [2:0] DMIOp_D, DMIOp_E, DMIOp_M, DMIOp_W;
 
 wire [31:0] GRF_RD1_Out, GRF_RD2_Out;
-
+wire [31:0] DMOut;
 //
 
 forward Forward(
@@ -134,7 +135,7 @@ F_D_reg F_D(.IR_F(IR_F), .PC4_F(PC), .PC8_F(PC8_F), .clk(clk), .stall(pause), .r
 control ControlD(.IR(IR_D), 
 					  .NPCsel(NPCsel_D), .ExtOp(ExtOp_D), .NPCOp(NPCOp_D), .CMPOp(CMPOp_D),
 					  .ALUasel(ALUasel_D), .ALUbsel(ALUbsel_D), .ALUOp(ALUOp_D),
-					  .DM_RE(DM_RE_D), .DM_WE(DM_WE_D), .DMOp(DMOp_D),
+					  .DM_RE(DM_RE_D), .DM_WE(DM_WE_D), .DMOOp(DMOOp_D), .DMIOp(DMIOp_D),
 					  .A3sel(A3sel_D), .WDsel(WDsel_D), .GRF_WE(GRF_WE_D));
 
 mux2 MF_RD1(.s(Forward_RD1), .out(GRF_RD1), .d0(GRF_RD1_Out), .d1(GRF_WD));
@@ -163,7 +164,7 @@ D_E_reg D_E(.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D), .Rs_D(MF_RS_D_Out), .Rt_D
 control ControlE(.IR(IR_E), 
 					  .NPCsel(NPCsel_E), .ExtOp(ExtOp_E), .NPCOp(NPCOp_E), .CMPOp(CMPOp_E),
 					  .ALUasel(ALUasel_E), .ALUbsel(ALUbsel_E), .ALUOp(ALUOp_E),
-					  .DM_RE(DM_RE_E), .DM_WE(DM_WE_E), .DMOp(DMOp_E),
+					  .DM_RE(DM_RE_E), .DM_WE(DM_WE_E), .DMOOp(DMOOp_E), .DMIOp(DMIOp_E),
 					  .A3sel(A3sel_E), .WDsel(WDsel_E), .GRF_WE(GRF_WE_E));
 
 
@@ -188,14 +189,14 @@ E_M_reg E_M(.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .ALUOut_E(ALU_Out), .XALU
 control ControlM(.IR(IR_M), 
 					  .NPCsel(NPCsel_M), .ExtOp(ExtOp_M), .NPCOp(NPCOp_M), .CMPOp(CMPOp_M),
 					  .ALUasel(ALUasel_M), .ALUbsel(ALUbsel_M), .ALUOp(ALUOp_M),
-					  .DM_RE(DM_RE_M), .DM_WE(DM_WE_M), .DMOp(DMOp_M),
+					  .DM_RE(DM_RE_M), .DM_WE(DM_WE_M), .DMOOp(DMOOp_M), .DMIOp(DMIOp_M),
 					  .A3sel(A3sel_M), .WDsel(WDsel_M), .GRF_WE(GRF_WE_M));
 
 
 mux4 MF_RT_M(.s(ForwardRT_M), .out(MF_RT_M_Out), .d0(Rt_M), .d1(MUX_WD_Out), .d2(32'bx), .d3(32'bx));
 
 stageM M(.DM_A(ALUOut_M), .DM_WD(MF_RT_M_Out), .DM_Out(DM_Out),
-			.DM_RE(DM_RE_M), .DM_WE(DM_WE_M), .DMOp(DMOp_M),
+			.DM_RE(DM_RE_M), .DM_WE(DM_WE_M), .DMIOp(DMIOp_M),
 			.clk(clk), .reset(reset), .PC(PC4_M)
 );
 
@@ -210,13 +211,13 @@ M_W_reg M_W(.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XAL
 control ControlW(.IR(IR_W), 
 					  .NPCsel(NPCsel_W), .ExtOp(ExtOp_W), .NPCOp(NPCOp_W), .CMPOp(CMPOp_W),
 					  .ALUasel(ALUasel_W), .ALUbsel(ALUbsel_W), .ALUOp(ALUOp_W),
-					  .DM_RE(DM_RE_W), .DM_WE(DM_WE_W), .DMOp(DMOp_W),
+					  .DM_RE(DM_RE_W), .DM_WE(DM_WE_W), .DMOOp(DMOOp_W), .DMIOp(DMIOp_W),
 					  .A3sel(A3sel_W), .WDsel(WDsel_W), .GRF_WE(GRF_WE_W));
 
-
+dmOutput DMOutput(.A(ALUOut_W[1:0]), .DMOOp(DMOOp_W), .RD(DM_W), .DMOut(DMOut));
 
 mux4 #(5) MUX_A3(.s(A3sel_W), .out(MUX_A3_Out), .d0(IR_W[`Rd]), .d1(IR_W[`Rt]), .d2(IR_W[`Rs]), .d3(5'd31));
-mux4 MUX_WD(.s(WDsel_W), .out(MUX_WD_Out), .d0(ALUOut_W), .d1(DM_W), .d2(PC8_W), .d3(32'bx));
+mux4 MUX_WD(.s(WDsel_W), .out(MUX_WD_Out), .d0(ALUOut_W), .d1(DMOut), .d2(PC8_W), .d3(32'bx));
 
 assign GRF_A3 = MUX_A3_Out;
 assign GRF_WD = MUX_WD_Out;
