@@ -98,6 +98,8 @@ wire [31:0] DMOut;
 wire [3:0] XALUOp_D, XALUOp_E, XALUOp_M, XALUOp_W;
 wire [31:0] XALU_Out;
 wire Busy;
+
+wire [1:0] Tnew_D, Tnew_E, Tnew_M, Tnew_W, Tuse_Rs_D, Tuse_Rt_D;
 //
 
 forward Forward(
@@ -108,10 +110,13 @@ forward Forward(
 	.GRF_A3(GRF_A3), .Forward_RD1(Forward_RD1), .Forward_RD2(Forward_RD2)
 );
 
-pause Pause(.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), 
-				.WDsel_E(WDsel_E), .WDsel_M(WDsel_M), .A3sel_E(A3sel_E),
+pause Pause(.Tuse_Rs_D(Tuse_Rs_D), .Tuse_Rt_D(Tuse_Rt_D), .Tnew_E(Tnew_E), .Tnew_M(Tnew_M), .Tnew_W(Tnew_W),
+				.IR_D(IR_D), .IR_E(IR_E), .IR_M(IR_M), .IR_W(IR_W),
+				.A3sel_E(A3sel_E), .A3sel_M(A3sel_M), .A3sel_W(A3sel_W),
+				.GRF_WE_E(GRF_WE_E), .GRF_WE_M(GRF_WE_M), .GRF_WE_W(GRF_WE_W), 
+				.WDsel_E(WDsel_E), .WDsel_M(WDsel_M), 
 				.DM_WE_D(DM_WE_D), .DM_RE_E(DM_RE_E), .DM_RE_M(DM_RE_M),
-				.GRF_WE_E(GRF_WE_E), .NPCsel_D(NPCsel_D), 
+				.NPCsel_D(NPCsel_D), 
 				.Busy(Busy), .XALUOp_D(XALUOp_D),
 				.pause(pause)
 );
@@ -142,7 +147,9 @@ control ControlD(.IR(IR_D),
 					  .NPCsel(NPCsel_D), .ExtOp(ExtOp_D), .NPCOp(NPCOp_D), .CMPOp(CMPOp_D),
 					  .ALUasel(ALUasel_D), .ALUbsel(ALUbsel_D), .ALUOp(ALUOp_D), .XALUOp(XALUOp_D),
 					  .DM_RE(DM_RE_D), .DM_WE(DM_WE_D), .DMOOp(DMOOp_D), .DMIOp(DMIOp_D),
-					  .A3sel(A3sel_D), .WDsel(WDsel_D), .GRF_WE(GRF_WE_D));
+					  .A3sel(A3sel_D), .WDsel(WDsel_D), .GRF_WE(GRF_WE_D),
+					  .Tnew(Tnew_D), .Tuse_Rs(Tuse_Rs_D), .Tuse_Rt(Tuse_Rt_D)
+					  );
 
 mux2 MF_RD1(.s(Forward_RD1), .out(GRF_RD1), .d0(GRF_RD1_Out), .d1(GRF_WD));
 mux2 MF_RD2(.s(Forward_RD2), .out(GRF_RD2), .d0(GRF_RD2_Out), .d1(GRF_WD));
@@ -164,14 +171,15 @@ stageD D(.GRF_A1(IR_D[`Rs]), .GRF_A2(IR_D[`Rt]), .GRF_RD1(GRF_RD1_Out), .GRF_RD2
 // E
 
 
-D_E_reg D_E(.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D), .Rs_D(MF_RS_D_Out), .Rt_D(MF_RT_D_Out), .Ext_D(Ext_Out), .clk(clk), .clr(pause), .reset(reset),
-				.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .Rs_E(Rs_E), .Rt_E(Rt_E), .Ext_E(Ext_E));
+D_E_reg D_E(.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D), .Rs_D(MF_RS_D_Out), .Rt_D(MF_RT_D_Out), .Ext_D(Ext_Out), .clk(clk), .clr(pause), .reset(reset), .Tnew_D(Tnew_D),
+				.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .Rs_E(Rs_E), .Rt_E(Rt_E), .Ext_E(Ext_E), .Tnew_E(Tnew_E));
 
 control ControlE(.IR(IR_E), 
 					  .NPCsel(NPCsel_E), .ExtOp(ExtOp_E), .NPCOp(NPCOp_E), .CMPOp(CMPOp_E),
 					  .ALUasel(ALUasel_E), .ALUbsel(ALUbsel_E), .ALUOp(ALUOp_E), .XALUOp(XALUOp_E),
 					  .DM_RE(DM_RE_E), .DM_WE(DM_WE_E), .DMOOp(DMOOp_E), .DMIOp(DMIOp_E),
-					  .A3sel(A3sel_E), .WDsel(WDsel_E), .GRF_WE(GRF_WE_E));
+					  .A3sel(A3sel_E), .WDsel(WDsel_E), .GRF_WE(GRF_WE_E)
+					  );
 
 mux4 MF_RS_E(.s(ForwardRS_E), .out(MF_RS_E_Out), .d0(Rs_E), .d1(ALUOut_M), .d2(MUX_WD_Out), .d3(32'bx));
 mux4 MF_RT_E(.s(ForwardRT_E), .out(MF_RT_E_Out), .d0(Rt_E), .d1(ALUOut_M), .d2(MUX_WD_Out), .d3(32'bx));
@@ -187,8 +195,8 @@ stageE E(.ALUa(ALUa), .ALUb(ALUb), .ALUop(ALUOp_E), .ALU_Out(ALU_Out),
 // M
 
 
-E_M_reg E_M(.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .ALUOut_E(ALU_Out), .XALUOut_E(), .Rt_E(MF_RT_E_Out), .clk(clk), .reset(reset),
-				.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .Rt_M(Rt_M));
+E_M_reg E_M(.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .ALUOut_E(ALU_Out), .XALUOut_E(), .Rt_E(MF_RT_E_Out), .clk(clk), .reset(reset), .Tnew_E(Tnew_E),
+				.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .Rt_M(Rt_M), .Tnew_M(Tnew_M));
 
 
 
@@ -209,8 +217,8 @@ stageM M(.DM_A(ALUOut_M), .DM_WD(MF_RT_M_Out), .DM_Out(DM_Out),
 // W
 
 
-M_W_reg M_W(.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .DM_M(DM_Out), .clk(clk), .reset(reset),
-				.IR_W(IR_W), .PC4_W(PC4_W), .PC8_W(PC8_W), .ALUOut_W(ALUOut_W), .XALUOut_W(XALUOut_W), .DM_W(DM_W));
+M_W_reg M_W(.IR_M(IR_M), .PC4_M(PC4_M), .PC8_M(PC8_M), .ALUOut_M(ALUOut_M), .XALUOut_M(XALUOut_M), .DM_M(DM_Out), .clk(clk), .reset(reset),  .Tnew_M(Tnew_M),
+				.IR_W(IR_W), .PC4_W(PC4_W), .PC8_W(PC8_W), .ALUOut_W(ALUOut_W), .XALUOut_W(XALUOut_W), .DM_W(DM_W), .Tnew_W(Tnew_W));
 
 
 

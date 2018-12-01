@@ -33,15 +33,24 @@
 // macro
 `define R 6'b000000
 
-`define lw 	6'b100011
-`define lb 	6'b100000
-`define lbu 6'b100100
-`define sw 	6'b101011
-`define sb 	6'b101000
-`define sh 	6'b101001
-`define lh 	6'b100001
-`define lhu	6'b100101
+// normal
+`define lw 		6'b100011
+`define lb 		6'b100000
+`define lbu 	6'b100100
+`define sw 		6'b101011
+`define sb 		6'b101000
+`define sh 		6'b101001
+`define lh 		6'b100001
+`define lhu		6'b100101
 
+`define beq		6'b000100
+`define bgtz	6'b000111
+`define blez	6'b000110
+`define bne		6'b000101
+`define j		6'b000010
+`define jal		6'b000011
+
+// R
 `define mult	6'b011000
 `define multu	6'b011001
 `define div 	6'b011010
@@ -50,6 +59,14 @@
 `define mtlo	6'b010011
 `define mfhi	6'b010000
 `define mflo	6'b010010
+
+`define jalr	6'b001001
+`define jr		6'b001000
+
+
+// Rt
+`define bgez	5'b00001
+`define bltz	5'b00000
 
 module control(
 	 input [31:0] IR,
@@ -65,33 +82,23 @@ module control(
 	 output reg [3:0] ALUOp,
 	 output [3:0] XALUOp,
 	 
-	 output reg DM_RE,
-	 output reg DM_WE,
+	 output DM_RE,
+	 output DM_WE,
 	 output [2:0] DMOOp, DMIOp,
 	 
 	 output reg [1:0] A3sel,
 	 output reg [1:0] WDsel,
-	 output reg GRF_WE
+	 output reg GRF_WE,
+	 
+	 output reg [1:0] Tnew, Tuse_Rs, Tuse_Rt
     );
 
-assign DMOOp = IR[`Op] == `lw ? 0 :
-					IR[`Op] == `lb ? 2 :
-					IR[`Op] == `lbu ? 1 :
-					IR[`Op] == `sw ? 0 :
-					IR[`Op] == `sb ? 0 :
-					IR[`Op] == `lh ? 4 :
-					IR[`Op] == `lhu ? 3 :
-					`x ;
-					
 
-assign DMIOp = IR[`Op] == `lw ? 0 :
-					IR[`Op] == `lb ? 0 :
-					IR[`Op] == `lbu ? 0 :
-					IR[`Op] == `sw ? 0 :
-					IR[`Op] == `sb ? 1 :
-					IR[`Op] == `sh ? 2 :
-					`x;
+// Branch or Jump
 
+
+
+// XALU
 assign XALUOp = IR[`Op] == `R ? (
 						// R
 						IR[`Func] == `mult	? 1 :
@@ -105,6 +112,40 @@ assign XALUOp = IR[`Op] == `R ? (
 						`x
 					 ) : 
 					 `x;
+
+// DM
+assign DM_RE = IR[`Op] == `lw 	? 1 :
+				   IR[`Op] == `lb 	? 1 :
+				   IR[`Op] == `lbu 	? 1 :
+				   IR[`Op] == `lh 	? 1 :
+				   IR[`Op] == `sb 	? 1 :
+				   IR[`Op] == `sh 	? 1 :
+			      0;
+					
+assign DM_WE = IR[`Op] == `sw 	? 1 :
+				   IR[`Op] == `sb 	? 1 :
+				   IR[`Op] == `sh 	? 1 :
+			      0;
+
+assign DMOOp = IR[`Op] == `lw 	? 0 :
+					IR[`Op] == `lb 	? 2 :
+					IR[`Op] == `lbu	? 1 :
+					IR[`Op] == `sw 	? 0 :
+					IR[`Op] == `sb		? 0 :
+					IR[`Op] == `lh 	? 4 :
+					IR[`Op] == `lhu 	? 3 :
+					`x ;
+					
+
+assign DMIOp = IR[`Op] == `lw ? 0 :
+					IR[`Op] == `lb ? 0 :
+					IR[`Op] == `lbu ? 0 :
+					IR[`Op] == `sw ? 0 :
+					IR[`Op] == `sb ? 1 :
+					IR[`Op] == `sh ? 2 :
+					`x;
+
+// Ext, ALU, GRF | T
 
 always @(*) begin
 case (IR[`Op])
@@ -120,12 +161,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
 			end		
 			
 			`multu: begin
@@ -138,12 +181,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
 			end		
 			
 			`div: begin
@@ -156,12 +201,13 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
 			end		
 			
 			`divu: begin
@@ -174,12 +220,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
 			end		
 			
 			`mthi: begin
@@ -192,12 +240,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
 			end		
 			
 			`mtlo: begin
@@ -210,13 +260,15 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
-			end	
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
+			end		
 
 			`mfhi: begin
 				NPCsel	= 0;
@@ -228,13 +280,15 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= 4'b1011;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
-			end		
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
+			end			
 			
 			`mflo: begin
 				NPCsel	= 0;
@@ -246,13 +300,15 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= 4'b1011;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
-			end
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
+			end	
 			
 			6'b100001: begin: addu
 				NPCsel	= 0;
@@ -264,13 +320,15 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0000;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
-			end
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
+			end	
 			
 			6'b100000: begin: add
 				NPCsel	= 0;
@@ -282,12 +340,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0000;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b100011: begin: subu
@@ -300,12 +360,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0001;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b100010: begin: sub
@@ -318,12 +380,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0001;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b101010: begin: slt
@@ -336,12 +400,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0111;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b101011: begin: sltu
@@ -354,12 +420,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b1000;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b000000: begin: sll
@@ -372,12 +440,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0110;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b000011: begin: sra
@@ -390,12 +460,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0101;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b00010: begin: srl
@@ -408,12 +480,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0100;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b100100: begin: and_
@@ -426,12 +500,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0010;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b100111: begin: nor_
@@ -444,12 +520,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b1001;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b100101: begin: or_
@@ -462,12 +540,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0011;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b100110: begin: xor_
@@ -480,12 +560,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b1010;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b000100: begin: sllv
@@ -498,12 +580,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0110;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b000111: begin: srav
@@ -516,12 +600,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0101;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b000110: begin: srlv
@@ -534,12 +620,14 @@ case (IR[`Op])
 				ALUbsel	= 0;
 				ALUOp		= 4'b0100;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end
 			
 			6'b001001: begin: jalr
@@ -552,12 +640,14 @@ case (IR[`Op])
 				ALUbsel	= 2;
 				ALUOp		= 4'b1100;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= 0;
 				WDsel		= 0;
 				GRF_WE	= 1;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 0;
+				Tuse_Rt	= 3;
 			end
 			
 			6'b001000: begin: jr
@@ -570,12 +660,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 0;
+				Tuse_Rt	= 3;
 			end
 			
 			default: begin
@@ -588,12 +680,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= 4'bxxxx;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
 			end
 		endcase
 	end
@@ -610,12 +704,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= `x;
-				DM_WE		= `x;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= `x;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 0;
+				Tuse_Rt	= 3;
 			end
 			
 			5'b00000: begin: bltz
@@ -628,12 +724,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= `x;
 			
-				DM_RE		= `x;
-				DM_WE		= `x;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= `x;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 0;
+				Tuse_Rt	= 3;
 			end
 			
 			default: begin
@@ -646,12 +744,14 @@ case (IR[`Op])
 				ALUbsel	= `x;
 				ALUOp		= 4'bxxxx;
 			
-				DM_RE		= 0;
-				DM_WE		= 0;
-				 				
+				 				 				 				
 				A3sel		= `x;
 				WDsel		= `x;
 				GRF_WE	= 0;
+				
+				Tnew		= 0;
+				Tuse_Rs	= 3;
+				Tuse_Rt	= 3;
 			end
 			
 		endcase
@@ -667,12 +767,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 0;
-	   DM_WE		= 1;
-		
+		 	    		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 1;
 	end
 	
 	6'b101000: begin: sb
@@ -685,12 +787,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 1;
-	   DM_WE		= 1;
-		
+		 	    		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 1;
 	end
 	
 	6'b101001: begin: sh
@@ -703,12 +807,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 1;
-	   DM_WE		= 1;
-		
+		 	    		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 1;
 	end
 	
 	6'b100011: begin: lw
@@ -721,12 +827,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 1;
-	   DM_WE		= 0;
-		
+		 	    		
 		A3sel		= 1;
 		WDsel		= 1;
 		GRF_WE	= 1;
+		
+		Tnew		= 2;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b100000: begin: lb
@@ -739,12 +847,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 1;
-	   DM_WE		= 0;
-		
+		 	    		
 		A3sel		= 1;
 		WDsel		= 1;
 		GRF_WE	= 1;
+		
+		Tnew		= 2;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b100100: begin: lbu
@@ -757,12 +867,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 1;
-	   DM_WE		= 0;
-		
+		 	    		
 		A3sel		= 1;
 		WDsel		= 1;
 		GRF_WE	= 1;
+		
+		Tnew		= 2;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	`lh: begin: lh
@@ -775,12 +887,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 1;
-	   DM_WE		= 0;
-		
+		 	    		
 		A3sel		= 1;
 		WDsel		= 1;
 		GRF_WE	= 1;
+		
+		Tnew		= 2;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	`lhu: begin: lhu
@@ -793,13 +907,16 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 1;
-	   DM_WE		= 0;
-		
+		 	    		
 		A3sel		= 1;
 		WDsel		= 1;
 		GRF_WE	= 1;
+		
+		Tnew		= 2;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
+	
 	6'b001010: begin: slti
 		NPCsel	= 0;
 		NPCOp		= `x;
@@ -810,12 +927,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0111;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b001011: begin: sltiu
@@ -828,12 +947,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b1000;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b001100: begin: andi
@@ -846,12 +967,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0010;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b001101: begin: ori
@@ -864,12 +987,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0011;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b001110: begin: xori
@@ -882,12 +1007,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b1010;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b001111: begin: lui
@@ -900,12 +1027,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b1100;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b001001: begin: addiu
@@ -918,12 +1047,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b001000: begin: addi
@@ -936,12 +1067,14 @@ case (IR[`Op])
 	   ALUbsel	= 1;
 		ALUOp		= 4'b0000;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 1;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 1;
+		Tuse_Rs	= 1;
+		Tuse_Rt	= 3;
 	end
 	
 	
@@ -955,12 +1088,14 @@ case (IR[`Op])
 	   ALUbsel	= `x;
 		ALUOp		= `x;
 	
-		DM_RE		= `x;
-	   DM_WE		= `x;
-		 		
+		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= `x;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 0;
+		Tuse_Rt	= 0;
 	end
 	
 	6'b000111: begin: bgtz
@@ -973,12 +1108,14 @@ case (IR[`Op])
 	   ALUbsel	= `x;
 		ALUOp		= `x;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 0;
+		Tuse_Rt	= 0;
 	end
 	
 	6'b000110: begin: blez
@@ -991,12 +1128,14 @@ case (IR[`Op])
 	   ALUbsel	= `x;
 		ALUOp		= `x;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 0;
+		Tuse_Rt	= 0;
 	end
 	
 	6'b000101: begin: bne
@@ -1009,12 +1148,14 @@ case (IR[`Op])
 	   ALUbsel	= `x;
 		ALUOp		= `x;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 0;
+		Tuse_Rt	= 0;
 	end
 	
 	6'b000010: begin: j
@@ -1027,12 +1168,14 @@ case (IR[`Op])
 	   ALUbsel	= `x;
 		ALUOp		= `x;
 	
-		DM_RE		= `x;
-	   DM_WE		= `x;
-		 		
+		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= `x;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 3;
+		Tuse_Rt	= 3;
 	end
 	
 	6'b000011: begin: jal
@@ -1045,12 +1188,14 @@ case (IR[`Op])
 	   ALUbsel	= 2;
 		ALUOp		= 4'b1100;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= 3;
 		WDsel		= 0;
 		GRF_WE	= 1;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 3;
+		Tuse_Rt	= 3;
 	end
 	
 	default: begin
@@ -1063,12 +1208,14 @@ case (IR[`Op])
 	   ALUbsel	= `x;
 		ALUOp		= 4'bxxxx;
 	
-		DM_RE		= 0;
-	   DM_WE		= 0;
-		 		
+		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
 		GRF_WE	= 0;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 3;
+		Tuse_Rt	= 3;
 	end
 endcase
 end

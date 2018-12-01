@@ -29,25 +29,75 @@
 `define Addr 25:0
 
 module pause(
-	 input [31:0] IR_D,
-	 input [31:0] IR_E,
-	 input [31:0] IR_M,
+	 input [1:0] Tuse_Rs_D, Tuse_Rt_D,
+	 input [1:0] Tnew_E, Tnew_M, Tnew_W,
+
+	 input [31:0] IR_D, IR_E, IR_M, IR_W,
+	 
+	 input GRF_WE_E, GRF_WE_M, GRF_WE_W,
+	 
+	 input [1:0] A3sel_E, A3sel_M, A3sel_W,
 	 
 	 input DM_WE_D,
 	 input [1:0] WDsel_E,
 	 input DM_RE_E,
 	 input [1:0] WDsel_M,
 	 input DM_RE_M,
-	 input [1:0] A3sel_E,
-	 input GRF_WE_E,
+	 
 	 input [1:0] NPCsel_D,
 	 
 	 input Busy,
 	 input [3:0] XALUOp_D,
 	 
-    output reg pause
+    output pause
     );
 
+reg [4:0] A3_E, A3_M, A3_W;
+
+always @(*) begin
+	case (A3sel_E)
+		2'b00: A3_E = IR_E[`Rd];
+		2'b01: A3_E = IR_E[`Rt];
+		2'b10: A3_E = IR_E[`Rs];
+		2'b11: A3_E = 32'd31;
+		default: A3_E = 32'bx;
+	endcase
+	
+	case (A3sel_M)
+		2'b00: A3_M = IR_M[`Rd];
+		2'b01: A3_M = IR_M[`Rt];
+		2'b10: A3_M = IR_M[`Rs];
+		2'b11: A3_M = 32'd31;
+		default: A3_M = 32'bx;
+	endcase
+	
+	case (A3sel_W)
+		2'b00: A3_W = IR_W[`Rd];
+		2'b01: A3_W = IR_W[`Rt];
+		2'b10: A3_W = IR_W[`Rs];
+		2'b11: A3_W = 32'd31;
+		default: A3_W = 32'bx;
+	endcase
+end
+
+wire xalu = Busy && XALUOp_D != 0;
+
+wire stall_Rs = 
+					((IR_D[`Rs] == A3_E) && (A3_E != 0) && (GRF_WE_E) && (Tuse_Rs_D < Tnew_E)) ||
+					((IR_D[`Rs] == A3_M) && (A3_M != 0) && (GRF_WE_M) && (Tuse_Rs_D < Tnew_M)) ||
+					((IR_D[`Rs] == A3_W) && (A3_W != 0) && (GRF_WE_W) && (Tuse_Rs_D < Tnew_W)) ;
+					
+wire stall_Rt = 
+					((IR_D[`Rt] == A3_E) && (A3_E != 0) && (GRF_WE_E) && (Tuse_Rt_D < Tnew_E)) ||
+					((IR_D[`Rt] == A3_M) && (A3_M != 0) && (GRF_WE_M) && (Tuse_Rt_D < Tnew_M)) ||
+					((IR_D[`Rt] == A3_W) && (A3_W != 0) && (GRF_WE_W) && (Tuse_Rt_D < Tnew_W)) ;
+
+assign pause = xalu === 1 || stall_Rs === 1 || stall_Rt === 1;
+	
+	 
+	
+	 
+/*
 reg lw_r, lw_b, lw_sw, lw_o, rd_bj, rd_jr, rt_bj, rt_jr, jal_bj, jal_jr, lw_b_m, lw_j_m, xalu, lw_sw_m, lw_sw_e;
 
 always @(*) begin
@@ -86,5 +136,5 @@ always @(*) begin
 			  
 			  ;
 end
-
+*/
 endmodule
