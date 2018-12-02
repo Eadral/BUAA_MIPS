@@ -310,6 +310,26 @@ case (IR[`Op])
 				Tuse_Rt	= 3;
 			end	
 			
+			6'b001010: begin: movz
+				NPCsel	= 0;
+				NPCOp		= `x;
+				CMPOp		= `x;
+				ExtOp		= `x;
+				
+				ALUasel	= 0;
+				ALUbsel	= `x;
+				ALUOp		= 4'b1011;
+			
+				 				 				 				
+				A3sel		= 4;
+				WDsel		= 0;
+				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
+			end
+			
 			6'b100001: begin: addu
 				NPCsel	= 0;
 				NPCOp		= `x;

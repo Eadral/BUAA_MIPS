@@ -119,7 +119,7 @@ pause Pause(.Tuse_Rs_D(Tuse_Rs_D), .Tuse_Rt_D(Tuse_Rt_D), .Tnew_E(Tnew_E), .Tnew
 				.WDsel_E(WDsel_E), .WDsel_M(WDsel_M), 
 				.DM_WE_D(DM_WE_D), .DM_RE_E(DM_RE_E), .DM_RE_M(DM_RE_M),
 				.NPCsel_D(NPCsel_D), 
-				.Busy(Busy), .XALUOp_D(XALUOp_D),
+				.Busy(Busy || XALUOp_E > 0), .XALUOp_D(XALUOp_D),
 				.pause(pause)
 );
 
@@ -196,7 +196,7 @@ stageE E(.ALUa(ALUa), .ALUb(ALUb), .ALUop(ALUOp_E), .ALU_Out(ALU_Out),
 
 mux8 #(5) MUX_A3(.s(A3sel_E), .out(A3_E), 
 					  .d0(IR_E[`Rd]), .d1(IR_E[`Rt]), .d2(IR_E[`Rs]), .d3(5'd31),
-					  .d4(5'bx), .d5(5'bx), .d6(5'bx), .d7(5'bx)
+					  .d4(MF_RT_E_Out == 0 ? IR_E[`Rd] : 5'b0), .d5(5'bx), .d6(5'bx), .d7(5'bx)
 					  );
 
 // M
