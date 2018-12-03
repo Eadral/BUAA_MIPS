@@ -23,9 +23,10 @@ module im #(parameter SIZE=4096)(
     output [31:0] Instr
     );
 
+wire [31:0] imA = PC - 'h3000;
 
 reg [31:0] im [0:SIZE-1];
-assign Instr = im[PC[11:2]];
+assign Instr = im[imA[13:2]];
 
 initial begin
 	$readmemh("code.txt", im);

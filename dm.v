@@ -42,7 +42,7 @@ always @(posedge clk) begin
 		for (i = 0; i < SIZE; i = i + 1)
 			dm[i] <= 0;
 	end else if (WE) begin
-		$display("%d@%h: *%h <= %h", $time, PC, A, WD);
+		$display("%d@%h: *%h <= %h", $time, PC, A >> 2 << 2, WD);
 		//if (BE[3] == 1) dm[A[13:2]][31:24] = WD[31:24];
 		//if (BE[2] == 1) dm[A[13:2]][23:16] = WD[23:16];
 		//if (BE[1] == 1) dm[A[13:2]][15:8] = WD[15:8];

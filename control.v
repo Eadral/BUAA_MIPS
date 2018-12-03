@@ -167,8 +167,8 @@ case (IR[`Op])
 				GRF_WE	= 0;
 				
 				Tnew		= 0;
-				Tuse_Rs	= 3;
-				Tuse_Rt	= 3;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end		
 			
 			`multu: begin
@@ -187,8 +187,8 @@ case (IR[`Op])
 				GRF_WE	= 0;
 				
 				Tnew		= 0;
-				Tuse_Rs	= 3;
-				Tuse_Rt	= 3;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end		
 			
 			`div: begin
@@ -206,8 +206,8 @@ case (IR[`Op])
 				GRF_WE	= 0;
 				
 				Tnew		= 0;
-				Tuse_Rs	= 3;
-				Tuse_Rt	= 3;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end		
 			
 			`divu: begin
@@ -226,8 +226,8 @@ case (IR[`Op])
 				GRF_WE	= 0;
 				
 				Tnew		= 0;
-				Tuse_Rs	= 3;
-				Tuse_Rt	= 3;
+				Tuse_Rs	= 1;
+				Tuse_Rt	= 1;
 			end		
 			
 			`mthi: begin
@@ -246,7 +246,7 @@ case (IR[`Op])
 				GRF_WE	= 0;
 				
 				Tnew		= 0;
-				Tuse_Rs	= 3;
+				Tuse_Rs	= 1;
 				Tuse_Rt	= 3;
 			end		
 			
@@ -266,7 +266,7 @@ case (IR[`Op])
 				GRF_WE	= 0;
 				
 				Tnew		= 0;
-				Tuse_Rs	= 3;
+				Tuse_Rs	= 1;
 				Tuse_Rt	= 3;
 			end		
 
@@ -285,7 +285,7 @@ case (IR[`Op])
 				WDsel		= 0;
 				GRF_WE	= 1;
 				
-				Tnew		= 0;
+				Tnew		= 1;
 				Tuse_Rs	= 3;
 				Tuse_Rt	= 3;
 			end			
@@ -305,7 +305,7 @@ case (IR[`Op])
 				WDsel		= 0;
 				GRF_WE	= 1;
 				
-				Tnew		= 0;
+				Tnew		= 1;
 				Tuse_Rs	= 3;
 				Tuse_Rt	= 3;
 			end	
@@ -941,7 +941,7 @@ case (IR[`Op])
 		NPCsel	= 0;
 		NPCOp		= `x;
 		CMPOp		= `x;
-		ExtOp		= 1;
+		ExtOp		= 0;
 		
 		ALUasel	= 0;
 	   ALUbsel	= 1;
@@ -961,7 +961,7 @@ case (IR[`Op])
 		NPCsel	= 0;
 		NPCOp		= `x;
 		CMPOp		= `x;
-		ExtOp		= 1;
+		ExtOp		= 0;
 		
 		ALUasel	= 0;
 	   ALUbsel	= 1;

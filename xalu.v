@@ -51,7 +51,7 @@ always @(posedge clk) begin
 		if (cycle == 0 && Start) begin
 			case (XALUOp) 
 				1: begin: mult
-					{HI, LO} <= $signed($signed(D1) * $signed(D2));
+					{HI, LO} <= $signed(D1) * $signed(D2);
 					cycle <= 5;
 				end
 				2: begin: multu
@@ -63,14 +63,24 @@ always @(posedge clk) begin
 				//5: XALU_Out <= HI;
 				//6: XALU_Out <= LO;
 				7: begin: div
-					LO <= $signed($signed(D1) / $signed(D2));
-					HI <= $signed($signed(D1) % $signed(D2));
-					cycle <= 10;
+					if (D2 == 0) begin
+						LO <= LO;
+						HI <= HI;
+					end else begin
+						LO <= $signed(D1) / $signed(D2);
+						HI <= $signed(D1) % $signed(D2);
+						cycle <= 10;
+					end
 				end
 				8: begin: divu
-					LO <= D1 / D2;
-					HI <= D1 % D2;
-					cycle <= 10;
+					if (D2 == 0) begin
+						LO <= LO;
+						HI <= HI;
+					end else begin
+						LO <= D1 / D2;
+						HI <= D1 % D2;
+						cycle <= 10;
+					end
 				end
 				default: {HI, LO} <= {HI, LO};
 			endcase

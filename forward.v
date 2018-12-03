@@ -65,13 +65,13 @@ end
 always @(*) begin
 	
 	// Forward_RD1
-	if ((IR_D[`Rs] == A3_W) && (A3_W != 0))  
+	if ((IR_D[`Rs] == A3_W) && (A3_W != 0) && RWE_W)  
 		Forward_RD1 = 1;
 	else 
 		Forward_RD1 = 0;
 		
 	// Forward_RD2
-	if ((IR_D[`Rt] == A3_W) && (A3_W != 0))  
+	if ((IR_D[`Rt] == A3_W) && (A3_W != 0) && RWE_W)  
 		Forward_RD2 = 1;
 	else 
 		Forward_RD2 = 0;
