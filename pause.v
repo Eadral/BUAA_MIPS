@@ -47,12 +47,13 @@ module pause(
 	 input [1:0] NPCsel_D,
 	 
 	 input Busy,
+	 input StallX,
 	 input [3:0] XALUOp_D,
 	 
     output pause
     );
 
-wire xalu = Busy && XALUOp_D != 0;
+wire xalu = (Busy && XALUOp_D != 0) || (Busy && StallX);
 
 wire stall_Rs = 
 					((IR_D[`Rs] == A3_E) && (A3_E != 0) && (GRF_WE_E) && (Tuse_Rs_D < Tnew_E)) ||

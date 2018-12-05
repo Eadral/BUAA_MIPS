@@ -67,6 +67,8 @@ module stageD(
 	 input clk,
 	 input reset,
 	 
+	 output Jump,
+	 
 	 input [4:0] GRF_A3,
 	 input [31:0] GRF_WD,
 	 input GRF_WE,

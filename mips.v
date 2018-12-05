@@ -42,7 +42,7 @@ wire GRF_WE_E, GRF_WE_M, GRF_WE_W;
 wire [2:0] A3sel_D, A3sel_M, A3sel_W, A3sel_E;
 wire [1:0] WDsel_E, WDsel_M, NPCsel_D;
 wire [31:0] NPC;
-wire Jump;
+wire Jump_D, Jump_E;
 wire [31:0] PC4_F, NPC_Out, MF_RS_D_Out;
 wire pause;
 wire [31:0] PC;
@@ -141,7 +141,7 @@ stageF F(.PC(PC), .clk(clk), .reset(reset),
 // D
 
 
-F_D_reg F_D(.IR_F(IR_F), .PC4_F(PC), .PC8_F(PC8_F), .clk(clk), .stall(pause), .reset(reset),
+F_D_reg F_D(.IR_F(IR_F), .PC4_F(PC), .PC8_F(PC8_F), .clk(clk), .stall(pause), .reset(reset), .clr(Likely_D && Jump_D),
 				.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D) );
 
 
@@ -160,7 +160,7 @@ mux4 MF_RS_D(.s(ForwardRS_D), .out(MF_RS_D_Out), .d0(GRF_RD1), .d1(ALUOut_M), .d
 mux4 MF_RT_D(.s(ForwardRT_D), .out(MF_RT_D_Out), .d0(GRF_RD2), .d1(ALUOut_M), .d2(MUX_WD_Out), .d3(PC8_E));
 
 stageD D(.GRF_A1(IR_D[`Rs]), .GRF_A2(IR_D[`Rt]), .GRF_RD1(GRF_RD1_Out), .GRF_RD2(GRF_RD2_Out),
-			.CMP_D1(MF_RS_D_Out), .CMP_D2(MF_RT_D_Out), .CMPOp(CMPOp_D), /*.Jump(Jump),*/
+			.CMP_D1(MF_RS_D_Out), .CMP_D2(MF_RT_D_Out), .CMPOp(CMPOp_D), .Jump(Jump_D),
 			.Ext_In(IR_D[`Imm]), .Ext_Out(Ext_Out), .ExtOp(ExtOp_D),
 			.NPC_PC4(PC4_D), .NPC_Addr(IR_D[`Addr]), .npcOp(NPCOp_D), .NPCOut(NPC_Out),
 			.clk(clk), .reset(reset), .PC(PC4_W),
@@ -173,8 +173,8 @@ stageD D(.GRF_A1(IR_D[`Rs]), .GRF_A2(IR_D[`Rt]), .GRF_RD1(GRF_RD1_Out), .GRF_RD2
 // E
 
 
-D_E_reg D_E(.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D), .Rs_D(MF_RS_D_Out), .Rt_D(MF_RT_D_Out), .Ext_D(Ext_Out), .clk(clk), .clr(pause), .reset(reset), .Tnew_D(Tnew_D),
-				.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .Rs_E(Rs_E), .Rt_E(Rt_E), .Ext_E(Ext_E), .Tnew_E(Tnew_E));
+D_E_reg D_E(.IR_D(IR_D), .PC4_D(PC4_D), .PC8_D(PC8_D), .Rs_D(MF_RS_D_Out), .Rt_D(MF_RT_D_Out), .Ext_D(Ext_Out), .clk(clk), .clr(pause), .reset(reset), .Tnew_D(Tnew_D), .Jump_D(Jump_D),
+				.IR_E(IR_E), .PC4_E(PC4_E), .PC8_E(PC8_E), .Rs_E(Rs_E), .Rt_E(Rt_E), .Ext_E(Ext_E), .Tnew_E(Tnew_E), .Jump_E(Jump_E));
 
 control ControlE(.IR(IR_E), 
 					  .NPCsel(NPCsel_E), .ExtOp(ExtOp_E), .NPCOp(NPCOp_E), .CMPOp(CMPOp_E),
@@ -196,7 +196,8 @@ stageE E(.ALUa(ALUa), .ALUb(ALUb), .ALUop(ALUOp_E), .ALU_Out(ALU_Out),
 
 mux8 #(5) MUX_A3(.s(A3sel_E), .out(A3_E), 
 					  .d0(IR_E[`Rd]), .d1(IR_E[`Rt]), .d2(IR_E[`Rs]), .d3(5'd31),
-					  .d4(MF_RT_E_Out == 0 ? IR_E[`Rd] : 5'b0), .d5(5'bx), .d6(5'bx), .d7(5'bx)
+					  .d4(MF_RT_E_Out == 0 ? IR_E[`Rd] : 5'b0),
+					  .d5(Jump_E ? 5'd31 : 5'b0), .d6(5'bx), .d7(5'bx)
 					  );
 
 // M

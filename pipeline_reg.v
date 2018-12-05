@@ -27,6 +27,7 @@ module F_D_reg(
     output reg [31:0] PC8_D,
 	 input clk,
     input stall,
+	 input clr,
 	 input reset
     );
 
@@ -37,7 +38,7 @@ initial begin
 end
 
 always @(posedge clk) begin
-	if (reset) begin
+	if (reset || clr) begin
 		IR_D <= 32'b0;
 		PC4_D <= 32'b0;
 		PC8_D <= 32'b0;
@@ -64,6 +65,7 @@ module D_E_reg(
     input [31:0] Rt_D,
     input [31:0] Ext_D,
 	 input [1:0] Tnew_D,
+	 input Jump_D,
 	 output reg [31:0] IR_E,
 	 output reg [31:0] PC4_E,
 	 output reg [31:0] PC8_E,
@@ -71,6 +73,7 @@ module D_E_reg(
 	 output reg [31:0] Rt_E,
 	 output reg [31:0] Ext_E,
 	 output reg [1:0] Tnew_E,
+	 output reg Jump_E,
 	 input clk,
 	 input clr,
 	 input reset
@@ -84,6 +87,7 @@ initial begin
 	Rt_E	= 32'b0; 
 	Ext_E	= 32'b0; 
 	Tnew_E = 0;
+	Jump_E = 0;
 end
 
 always @(posedge clk) begin
@@ -95,6 +99,7 @@ always @(posedge clk) begin
 		Rt_E	<= 32'b0; 
 		Ext_E	<= 32'b0; 
 		Tnew_E <= 0;
+		Jump_E <= 0;
 	end else
 	if (clr) begin
 		IR_E	<= 32'b0; 
@@ -104,6 +109,7 @@ always @(posedge clk) begin
 		Rt_E	<= 32'b0; 
 		Ext_E	<= 32'b0; 
 		Tnew_E <= 0;
+		Jump_E <= 0;
 	end else begin
 		IR_E	<= IR_D; 
 		PC4_E	<= PC4_D; 
@@ -111,6 +117,7 @@ always @(posedge clk) begin
 		Rs_E	<= Rs_D; 
 		Rt_E	<= Rt_D; 
 		Ext_E	<= Ext_D; 
+		Jump_E <= Jump_D;
 		if (Tnew_D > 0)
 			Tnew_E <= Tnew_D;
 		else

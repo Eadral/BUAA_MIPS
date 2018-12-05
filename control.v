@@ -50,6 +50,10 @@
 `define j		6'b000010
 `define jal		6'b000011
 
+`define beql	6'b010100
+
+`define special2	6'b011100
+
 // R
 `define mult	6'b011000
 `define multu	6'b011001
@@ -63,6 +67,10 @@
 `define jalr	6'b001001
 `define jr		6'b001000
 
+// Rs
+`define madd	6'b000000
+`define maddu	6'b000001
+`define mul 	6'b000010
 
 // Rt
 `define bgez	5'b00001
@@ -90,7 +98,8 @@ module control(
 	 output reg [1:0] WDsel,
 	 output reg GRF_WE,
 	 
-	 output reg [1:0] Tnew, Tuse_Rs, Tuse_Rt
+	 output reg [1:0] Tnew, Tuse_Rs, Tuse_Rt,
+	 output Likely
     );
 
 
@@ -109,8 +118,13 @@ assign XALUOp = IR[`Op] == `R ? (
 						IR[`Func] == `mtlo	? 4 :
 						IR[`Func] == `mfhi	? 5 :
 						IR[`Func] == `mflo	? 6 :
-						`x
-					 ) : 
+						`x ) : 
+					 IR[`Op] == `special2 ? (
+						// special
+						IR[`Func] == `madd	? 9  :
+						IR[`Func] == `maddu	? 10 :
+						IR[`Func] == `mul 	? 11 :
+						`x ) :
 					 `x;
 
 // DM
@@ -144,6 +158,10 @@ assign DMIOp = IR[`Op] == `lw ? 0 :
 					IR[`Op] == `sb ? 1 :
 					IR[`Op] == `sh ? 2 :
 					`x;
+
+// Likely
+assign Likely = IR[`Op] == `beql ? 1 :
+					 0;
 
 // Ext, ALU, GRF | T
 
@@ -466,7 +484,7 @@ case (IR[`Op])
 				GRF_WE	= 1;
 				
 				Tnew		= 1;
-				Tuse_Rs	= 1;
+				Tuse_Rs	= 3;
 				Tuse_Rt	= 1;
 			end
 			
@@ -486,28 +504,54 @@ case (IR[`Op])
 				GRF_WE	= 1;
 				
 				Tnew		= 1;
-				Tuse_Rs	= 1;
+				Tuse_Rs	= 3;
 				Tuse_Rt	= 1;
 			end
 			
 			6'b00010: begin: srl
-				NPCsel	= 0;
-				NPCOp		= `x;
-				CMPOp		= `x;
-				ExtOp		= `x;
+			case (IR[`Rs])
+				0: begin: R0
+					NPCsel	= 0;
+					NPCOp		= `x;
+					CMPOp		= `x;
+					ExtOp		= `x;
+					
+					ALUasel	= 1;
+					ALUbsel	= 0;
+					ALUOp		= 4'b0100;
 				
-				ALUasel	= 1;
-				ALUbsel	= 0;
-				ALUOp		= 4'b0100;
-			
-				 				 				 				
-				A3sel		= 0;
-				WDsel		= 0;
-				GRF_WE	= 1;
+																	
+					A3sel		= 0;
+					WDsel		= 0;
+					GRF_WE	= 1;
+					
+					Tnew		= 1;
+					Tuse_Rs	= 3;
+					Tuse_Rt	= 1;
+				end
 				
-				Tnew		= 1;
-				Tuse_Rs	= 1;
-				Tuse_Rt	= 1;
+				1: begin: R1
+					NPCsel	= 0;
+					NPCOp		= `x;
+					CMPOp		= `x;
+					ExtOp		= `x;
+					
+					ALUasel	= 1;
+					ALUbsel	= 0;
+					ALUOp		= 4'b1101;
+				
+																	
+					A3sel		= 0;
+					WDsel		= 0;
+					GRF_WE	= 1;
+					
+					Tnew		= 1;
+					Tuse_Rs	= 3;
+					Tuse_Rt	= 1;
+				end
+				
+				
+			endcase
 			end
 			
 			6'b100100: begin: and_
@@ -690,6 +734,8 @@ case (IR[`Op])
 				Tuse_Rt	= 3;
 			end
 			
+			
+			
 			default: begin
 				NPCsel	= 0;
 				NPCOp		= `x;
@@ -709,6 +755,7 @@ case (IR[`Op])
 				Tuse_Rs	= 3;
 				Tuse_Rt	= 3;
 			end
+			
 		endcase
 	end
 	
@@ -754,6 +801,26 @@ case (IR[`Op])
 				Tuse_Rt	= 3;
 			end
 			
+			5'b10001: begin: bgezal
+				NPCsel	= 1;
+				NPCOp		= 0;
+				CMPOp		= 1;
+				ExtOp		= `x;
+				
+				ALUasel	= `x;
+				ALUbsel	= 2;
+				ALUOp		= 4'b1100;
+			
+										
+				A3sel		= 5;
+				WDsel		= 0;
+				GRF_WE	= 1;
+				
+				Tnew		= 1;
+				Tuse_Rs	= 0;
+				Tuse_Rt	= 0;
+			end
+			
 			default: begin
 				NPCsel	= 0;
 				NPCOp		= `x;
@@ -775,6 +842,70 @@ case (IR[`Op])
 			end
 			
 		endcase
+	end
+	
+	6'b011100: begin: special2
+	case (IR[`Func])
+		0: begin: madd
+			NPCsel	= 0;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= `x;
+			ALUbsel	= `x;
+			ALUOp		= `x;
+
+															
+			A3sel		= `x;
+			WDsel		= `x;
+			GRF_WE	= 0;
+			
+			Tnew		= 0;
+			Tuse_Rs	= 1;
+			Tuse_Rt	= 1;
+		end		
+
+		1: begin: maddu
+			NPCsel	= 0;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= `x;
+			ALUbsel	= `x;
+			ALUOp		= `x;
+
+															
+			A3sel		= `x;
+			WDsel		= `x;
+			GRF_WE	= 0;
+			
+			Tnew		= 0;
+			Tuse_Rs	= 1;
+			Tuse_Rt	= 1;
+		end	
+		
+		6'b000010: begin: mul
+			NPCsel	= 0;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= 2;
+			ALUbsel	= `x;
+			ALUOp		= 4'b1011;
+			
+															
+			A3sel		= 0;
+			WDsel		= 0;
+			GRF_WE	= 1;
+			
+			Tnew		= 0;
+			Tuse_Rs	= 1;
+			Tuse_Rt	= 1;
+		end
+	endcase
 	end
 	
 	6'b101011: begin: sw
@@ -1118,6 +1249,26 @@ case (IR[`Op])
 		Tuse_Rt	= 0;
 	end
 	
+	6'b010100: begin: beql
+		NPCsel	= 1;
+		NPCOp		= 0;
+		CMPOp		= 0;
+		ExtOp		= `x;
+		
+		ALUasel	= `x;
+	   ALUbsel	= `x;
+		ALUOp		= `x;
+	
+		 	    		 		
+		A3sel		= `x;
+		WDsel		= `x;
+		GRF_WE	= `x;
+		
+		Tnew		= 0;
+		Tuse_Rs	= 0;
+		Tuse_Rt	= 0;
+	end
+	
 	6'b000111: begin: bgtz
 		NPCsel	= 1;
 		NPCOp		= 0;
@@ -1137,6 +1288,7 @@ case (IR[`Op])
 		Tuse_Rs	= 0;
 		Tuse_Rt	= 0;
 	end
+	
 	
 	6'b000110: begin: blez
 		NPCsel	= 1;

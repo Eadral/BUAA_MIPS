@@ -43,6 +43,7 @@ case (Op)
 	4'b1010: Out = A ^ B;
 	4'b1011: Out = A;
 	4'b1100: Out = B;
+	4'b1101: Out = (B << 32 - A[4:0])| (B >> A[4:0]);
 	
 	default: Out = 32'bx;
 endcase

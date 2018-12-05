@@ -29,6 +29,7 @@ module xalu(
 	
 reg [31:0] cycle;	
 reg [31:0] HI, LO;
+reg [31:0] mHI, mLO;
 
 assign Busy = cycle == 0 ? 0 : 1;
 
@@ -81,6 +82,14 @@ always @(posedge clk) begin
 						HI <= D1 % D2;
 						cycle <= 10;
 					end
+				end
+				9: begin: madd
+					{HI, LO} <= $signed({HI, LO}) + $signed(D1) * $signed(D2);
+					cycle <= 5;
+				end
+				10: begin: maddu
+					{HI, LO} <= {HI, LO} + D1 * D2;
+					cycle <= 5;
 				end
 				default: {HI, LO} <= {HI, LO};
 			endcase
