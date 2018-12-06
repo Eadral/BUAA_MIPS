@@ -925,7 +925,7 @@ case (IR[`Op])
 		
 		Tnew		= 0;
 		Tuse_Rs	= 1;
-		Tuse_Rt	= 1;
+		Tuse_Rt	= 2;
 	end
 	
 	6'b101000: begin: sb
