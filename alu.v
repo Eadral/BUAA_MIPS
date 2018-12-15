@@ -23,15 +23,16 @@ module alu(
     input [31:0] B,
     input [3:0] Op,
     output reg [31:0] Out,
-	 output Zero
+	 output Overflow
     );
 
-assign Zero = Out == 0 ? 1 : 0;
+reg t32;
+assign Overflow = t32 ^ Out[31];
 
 always @(*)
 case (Op)
-	4'b0000: Out = A + B;
-	4'b0001: Out = A - B;
+	4'b0000: {t32, Out} = {A[31], A} + {B[31], B};
+	4'b0001: {t32, Out} = {A[31], A} - {B[31], B};
 	4'b0010: Out = A & B;
 	4'b0011: Out = A | B;
 	4'b0100: Out = B >> A[4:0];

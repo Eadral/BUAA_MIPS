@@ -24,11 +24,12 @@ module xalu(
 	 input Start,
 	 output [31:0] XALU_Out,
 	 output Busy,
+	 input rollback,
 	 input clk, reset
     );
 	
 reg [31:0] cycle;	
-reg [31:0] HI, LO;
+reg [31:0] HI, LO, rHI, rLO;
 reg [31:0] mHI, mLO;
 
 assign Busy = cycle == 0 ? 0 : 1;
@@ -37,6 +38,8 @@ initial begin
 	cycle = 0;
 	HI = 0;
 	LO = 0;
+	rHI = 0;
+	rLO = 0;
 end
 
 assign XALU_Out = XALUOp == 5 ? HI :
@@ -44,12 +47,20 @@ assign XALU_Out = XALUOp == 5 ? HI :
 						32'bx;
 
 always @(posedge clk) begin
+	if (rollback) begin
+		HI <= rHI;
+		LO <= rLO;
+	end
 	if (reset) begin
 		cycle <= 0;
 		HI <= 0;
 		LO <= 0;
+		rHI <= 0;
+		rLO <= 0;
 	end else begin
 		if (cycle == 0 && Start) begin
+			rHI <= HI;
+			rLO <= LO;
 			case (XALUOp) 
 				1: begin: mult
 					{HI, LO} <= $signed(D1) * $signed(D2);

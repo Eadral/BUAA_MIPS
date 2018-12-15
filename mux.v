@@ -25,7 +25,7 @@ module mux2 #(parameter WIDTH=32) (
 	 output [WIDTH-1:0] out
     );
 
-assign out = s ? d1 : d0;
+assign out = s === 1 ? d1 : d0;
 
 endmodule
 

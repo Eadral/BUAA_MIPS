@@ -18,63 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-`define Op 31:26
-`define Rs 25:21
-`define Rt 20:16
-`define Rd 15:11
-`define Shamt 10:6
-`define Func 5:0
-
-`define Imm 15:0
-`define Addr 25:0
-
-`define x 32'bx
-
-// macro
-`define R 6'b000000
-
-// normal
-`define lw 		6'b100011
-`define lb 		6'b100000
-`define lbu 	6'b100100
-`define sw 		6'b101011
-`define sb 		6'b101000
-`define sh 		6'b101001
-`define lh 		6'b100001
-`define lhu		6'b100101
-
-`define beq		6'b000100
-`define bgtz	6'b000111
-`define blez	6'b000110
-`define bne		6'b000101
-`define j		6'b000010
-`define jal		6'b000011
-
-`define beql	6'b010100
-
-`define special2	6'b011100
-
-// R
-`define mult	6'b011000
-`define multu	6'b011001
-`define div 	6'b011010
-`define divu	6'b011011
-`define mthi	6'b010001
-`define mtlo	6'b010011
-`define mfhi	6'b010000
-`define mflo	6'b010010
-
-`define jalr	6'b001001
-`define jr		6'b001000
-
-// Rs
-`define madd	6'b000000
-`define maddu	6'b000001
-`define mul 	6'b000010
-
-// Rt
-`define bgez	5'b00001
-`define bltz	5'b00000
+`include "macro.v"
 
 module control(
 	 input [31:0] IR,
@@ -99,7 +43,9 @@ module control(
 	 output reg GRF_WE,
 	 
 	 output reg [1:0] Tnew, Tuse_Rs, Tuse_Rt,
-	 output Likely
+	 output Likely,
+	 output eret,
+	 output CP0_WE
     );
 
 
@@ -132,6 +78,7 @@ assign DM_RE = IR[`Op] == `lw 	? 1 :
 				   IR[`Op] == `lb 	? 1 :
 				   IR[`Op] == `lbu 	? 1 :
 				   IR[`Op] == `lh 	? 1 :
+				   IR[`Op] == `lhu 	? 1 :
 				   IR[`Op] == `sb 	? 1 :
 				   IR[`Op] == `sh 	? 1 :
 			      0;
@@ -162,6 +109,17 @@ assign DMIOp = IR[`Op] == `lw ? 0 :
 // Likely
 assign Likely = IR[`Op] == `beql ? 1 :
 					 0;
+
+// eret
+assign eret = IR == `eret;
+
+assign CP0_WE = IR[`Op] == `COP0 ? (
+						// R
+						IR[`Rs] == `mtc0	? 1 :
+						0 ) : 
+					 0;
+
+
 
 // Ext, ALU, GRF | T
 
@@ -908,6 +866,88 @@ case (IR[`Op])
 	endcase
 	end
 	
+	6'b010000: begin: COP0
+	case (IR[`Rs])
+		5'b10000: begin: eret
+			NPCsel	= `x;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= `x;
+			ALUbsel	= `x;
+			ALUOp		= 4'bxxxx;
+		
+									
+			A3sel		= `x;
+			WDsel		= `x;
+			GRF_WE	= 0;
+			
+			Tnew		= 0;
+			Tuse_Rs	= 3;
+			Tuse_Rt	= 3;
+		end
+		
+		5'b00100: begin: mtc0
+			NPCsel	= 0;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= `x;
+			ALUbsel	= `x;
+			ALUOp		= `x;
+			 				 				 				
+			A3sel		= `x;
+			WDsel		= `x;
+			GRF_WE	= 0;
+			
+			Tnew		= 0;
+			Tuse_Rs	= 3;
+			Tuse_Rt	= 1;
+		end
+		
+		5'b00000: begin: mfc0
+			NPCsel	= 0;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= `x;
+			ALUbsel	= `x;
+			ALUOp		= `x;
+			 				 				 				
+			A3sel		= 1;
+			WDsel		= 3;
+			GRF_WE	= 1;
+			
+			Tnew		= 2;
+			Tuse_Rs	= 3;
+			Tuse_Rt	= 3;
+		end
+		
+		default: begin
+			NPCsel	= 0;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= `x;
+			ALUbsel	= `x;
+			ALUOp		= 4'bxxxx;
+		
+									
+			A3sel		= `x;
+			WDsel		= `x;
+			GRF_WE	= `x;
+			
+			Tnew		= 0;
+			Tuse_Rs	= 3;
+			Tuse_Rt	= 3;
+		end
+	endcase
+	end
+	
 	6'b101011: begin: sw
 		NPCsel	= 0;
 		NPCOp		= `x;
@@ -1242,7 +1282,7 @@ case (IR[`Op])
 		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
-		GRF_WE	= `x;
+		GRF_WE	= 0;
 		
 		Tnew		= 0;
 		Tuse_Rs	= 0;
@@ -1262,7 +1302,7 @@ case (IR[`Op])
 		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
-		GRF_WE	= `x;
+		GRF_WE	= 0;
 		
 		Tnew		= 0;
 		Tuse_Rs	= 0;
@@ -1343,7 +1383,7 @@ case (IR[`Op])
 		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
-		GRF_WE	= `x;
+		GRF_WE	= 0;
 		
 		Tnew		= 0;
 		Tuse_Rs	= 3;
@@ -1383,7 +1423,7 @@ case (IR[`Op])
 		 	    		 		
 		A3sel		= `x;
 		WDsel		= `x;
-		GRF_WE	= 0;
+		GRF_WE	= `x;
 		
 		Tnew		= 0;
 		Tuse_Rs	= 3;

@@ -30,6 +30,7 @@ assign Instr = im[imA[13:2]];
 
 initial begin
 	$readmemh("code.txt", im);
+	$readmemh("code_handler.txt",im,1120,2047);
 end
 
 endmodule

@@ -59,7 +59,7 @@ module stageD(
 	 output [31:0] Ext_Out,
 	 input [1:0] ExtOp,
 	 
-	 input [31:0] NPC_PC4,
+	 input [31:0] NPC_PC,
 	 input [25:0] NPC_Addr,
 	 input [1:0] npcOp,
 	 output [31:0] NPCOut,
@@ -83,7 +83,7 @@ cmp CMP(.Rs(CMP_D1), .Rt(CMP_D2), .Op(CMPOp), .Jump(Jump));
 
 ext Ext(.In(Ext_In), .Out(Ext_Out), .Op(ExtOp));
 
-npc NPC(.PC(NPC_PC4), .Add(NPC_Addr), .npcOp(npcOp), .Jump(Jump), .NPC(NPCOut));
+npc NPC(.PC(NPC_PC), .Add(NPC_Addr), .npcOp(npcOp), .Jump(Jump), .NPC(NPCOut));
 
 endmodule
 
@@ -96,20 +96,24 @@ module stageE(
 	 input [31:0] ALUb,
 	 input [3:0] ALUop,
 	 output [31:0] ALU_Out,
+	 output Overflow,
 	 
 	 input [31:0] XALUa, XALUb,
 	 input [3:0] XALUOp,
+	 input Start,
 	 output [31:0] XALU_Out,
 	 output Busy,
-	 
+	 input rollback,
 	 input clk, reset
 	
     );
 
 
-alu ALU(.A(ALUa), .B(ALUb), .Op(ALUop), .Out(ALU_Out), .Zero());
+alu ALU(.A(ALUa), .B(ALUb), .Op(ALUop), .Out(ALU_Out), .Overflow(Overflow));
 
-xalu XALU(.D1(XALUa), .D2(XALUb), .XALUOp(XALUOp), .Start(XALUOp != 0), .XALU_Out(XALU_Out), .Busy(Busy), .clk(clk), .reset(reset));
+xalu XALU(.D1(XALUa), .D2(XALUb), .XALUOp(XALUOp), .Start(Start), 
+		.XALU_Out(XALU_Out), .Busy(Busy), .clk(clk), .reset(reset),
+		.rollback(rollback));
 
 endmodule
 

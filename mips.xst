@@ -1,5 +1,5 @@
-set -tmpdir "C:/Users/Eadral/ISE/P6/xst/projnav.tmp"
-set -xsthdpdir "C:/Users/Eadral/ISE/P6/xst"
+set -tmpdir "C:/Users/Eadral/ISE/P7/xst/projnav.tmp"
+set -xsthdpdir "C:/Users/Eadral/ISE/P7/xst"
 elaborate
 -ifn mips.prj
 -ifmt mixed

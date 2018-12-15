@@ -18,15 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-`define Op 31:26
-`define Rs 25:21
-`define Rt 20:16
-`define Rd 15:11
-`define Shamt 10:6
-`define Func 5:0
-
-`define Imm 15:0
-`define Addr 25:0
+`include "macro.v"
 
 module forward(
 	 
@@ -49,7 +41,10 @@ module forward(
 	 output reg [1:0] ForwardRT_M,
 	 
 	 output reg Forward_RD1,
-	 output reg Forward_RD2
+	 output reg Forward_RD2,
+	 
+	 input CP0_WE_E, CP0_WE_M,
+	 output reg [1:0] Forward_EPC
     );
 
 initial begin
@@ -63,6 +58,15 @@ initial begin
 end
 
 always @(*) begin
+	
+	// Forward_EPC
+	if (IR_D == `eret && CP0_WE_E && IR_E[`Rd] == 14)
+		Forward_EPC = 1;
+	else if (IR_D == `eret && CP0_WE_M && IR_M[`Rd] == 14) 
+		Forward_EPC = 2;
+	else
+		Forward_EPC = 0;
+	
 	
 	// Forward_RD1
 	if ((IR_D[`Rs] == A3_W) && (A3_W != 0) && RWE_W)  
