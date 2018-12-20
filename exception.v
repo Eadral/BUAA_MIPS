@@ -75,7 +75,7 @@ wire r =  (IR[`Op] == 0) && (
 
 assign Exc_D = !(normal || rs || eret || rt || r);
 
-assign ExcCode_D = Exc_D ? `AdEL : 5'bx;
+assign ExcCode_D = Exc_D ? `RI : 5'bx;
 
 endmodule
 

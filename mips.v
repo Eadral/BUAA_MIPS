@@ -66,10 +66,12 @@ timer Timer1(
     .ADD_I(DEV_Addr[3:0]), 
     .WE_I(DEV2_WE), 
     .DAT_I(DEV_WD), 
-    .DAT_O(DEV1_RD), 
+    .DAT_O(DEV2_RD), 
     .IRQ_O(HWInt[3]), 
     .clk(clk), 
     .reset(reset)
     );
+
+assign HWInt[7:4] = 0;
 
 endmodule

@@ -43,7 +43,6 @@ module control(
 	 output reg GRF_WE,
 	 
 	 output reg [1:0] Tnew, Tuse_Rs, Tuse_Rt,
-	 output Likely,
 	 output eret,
 	 output CP0_WE
     );
@@ -106,9 +105,6 @@ assign DMIOp = IR[`Op] == `lw ? 0 :
 					IR[`Op] == `sh ? 2 :
 					`x;
 
-// Likely
-assign Likely = IR[`Op] == `beql ? 1 :
-					 0;
 
 // eret
 assign eret = IR == `eret;

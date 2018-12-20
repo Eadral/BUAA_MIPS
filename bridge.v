@@ -30,7 +30,7 @@ module bridge(
 assign DEV_WD = PrWD;
 assign DEV_Addr = PrAddr;
 
-assign PrRd = PrAddr[15:4] == 12'h7F0 ? DEV1_RD : 
+assign PrRD = PrAddr[15:4] == 12'h7F0 ? DEV1_RD : 
 				  PrAddr[15:4] == 12'h7F1 ? DEV2_RD : 
 				  32'bx;
 

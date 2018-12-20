@@ -120,6 +120,7 @@ wire [31:0] MF_EPC_Out;
 wire [1:0] Forward_EPC;
 
 wire eret_nop;
+
 //
 
 forward Forward(
@@ -174,20 +175,20 @@ exceptionF ExceptionF(
 // D
 
 assign eret_nop = IR_D == `eret && !(pause === 1);
-F_D_reg F_D(.IR_F(IR_F), .PC_F(PC), .PC8_F(PC8_F), .clk(clk), .stall(pause), .reset(reset || IntReq), .clr(Likely_D && Jump_D),
+F_D_reg F_D(.IR_F(IR_F), .PC_F(PC), .PC8_F(PC8_F), .clk(clk), .stall(pause), .reset(reset || IntReq || eret_nop), .clr(Likely_D && Jump_D),
 				.IR_D(IR_D), .PC_D(PC_D), .PC8_D(PC8_D), 
 				.Exc_F(Exc_F), .ExcCode_F(ExcCode_F), .Exc_D(Exc_FD), .ExcCode_D(ExcCode_FD),
 				.slot_F(!(NPCsel_D === 0)), .slot_D(slot_D)
 				);
 
 
-control ControlD(.IR(IR_D), 
+control Control(.IR(IR_D), 
 					  .NPCsel(NPCsel_D), .ExtOp(ExtOp_D), .NPCOp(NPCOp_D), .CMPOp(CMPOp_D),
 					  .ALUasel(ALUasel_D), .ALUbsel(ALUbsel_D), .ALUOp(ALUOp_D), .XALUOp(XALUOp_D),
 					  .DM_RE(DM_RE_D), .DM_WE(DM_WE_D), .DMOOp(DMOOp_D), .DMIOp(DMIOp_D),
 					  .A3sel(A3sel_D), .WDsel(WDsel_D), .GRF_WE(GRF_WE_D),
 					  .Tnew(Tnew_D), .Tuse_Rs(Tuse_Rs_D), .Tuse_Rt(Tuse_Rt_D),
-					  .eret(eret_D)
+					  .eret(eret_D), .CP0_WE(CP0_WE_D)
 					  );
 
 mux2 MF_RD1(.s(Forward_RD1), .out(GRF_RD1), .d0(GRF_RD1_Out), .d1(GRF_WD));
@@ -219,7 +220,13 @@ exceptionD ExceptionD (
 D_E_reg D_E(.IR_D(IR_D), .PC_D(PC_D), .PC8_D(PC8_D), .Rs_D(MF_RS_D_Out), .Rt_D(MF_RT_D_Out), .Ext_D(Ext_Out), .clk(clk), .clr(pause), .reset(reset || IntReq), .Tnew_D(Tnew_D), .Jump_D(Jump_D), .pause_D(pause),
 				.IR_E(IR_E), .PC_E(PC_E), .PC8_E(PC8_E), .Rs_E(Rs_E), .Rt_E(Rt_E), .Ext_E(Ext_E), .Tnew_E(Tnew_E), .Jump_E(Jump_E), .pause_E(pause_E),
 				.Exc_D(Exc_FD || Exc_D), .ExcCode_D(Exc_FD ? ExcCode_FD : ExcCode_D), .Exc_E(Exc_DE), .ExcCode_E(ExcCode_DE),
-				.slot_D(slot_D), .slot_E(slot_E)
+				.slot_D(slot_D), .slot_E(slot_E),
+					  .NPCsel(NPCsel_D), .ExtOp(ExtOp_D), .NPCOp(NPCOp_D), .CMPOp(CMPOp_D),
+					  .ALUasel(ALUasel_D), .ALUbsel(ALUbsel_D), .ALUOp(ALUOp_D), .XALUOp(XALUOp_D),
+					  .DM_RE(DM_RE_D), .DM_WE(DM_WE_D), .DMOOp(DMOOp_D), .DMIOp(DMIOp_D),
+					  .A3sel(A3sel_D), .WDsel(WDsel_D), .GRF_WE(GRF_WE_D),
+					  .Tuse_Rs(Tuse_Rs_D), .Tuse_Rt(Tuse_Rt_D),
+					  .eret(eret_D), .CP0_WE(CP0_WE_D)
 				);
 
 control ControlE(.IR(IR_E), 
@@ -280,14 +287,17 @@ mux4 MF_RT_M(.s(ForwardRT_M), .out(MF_RT_M_Out), .d0(Rt_M), .d1(MUX_WD_Out), .d2
 
 assign PrAddr = ALUOut_M;
 assign PrWD = MF_RT_M_Out;
-assign PrWE = DM_WE_M;
+assign PrWE = DM_WE_M && !(IntReq === 1);
+
+wire Pr = ALUOut_M > 32'h0000_4FFF ? 1 : 0;
+assign Bridge_Out = Pr ? PrRD : DM_Out;
 
 stageM M(.DM_A(ALUOut_M), .DM_WD(MF_RT_M_Out), .DM_Out(DM_Out),
-			.DM_RE(DM_RE_M), .DM_WE(DM_WE_M && !(IntReq === 1)), .DMIOp(DMIOp_M),
+			.DM_RE(DM_RE_M), .DM_WE(DM_WE_M && !(IntReq === 1) && !(Pr === 1)), .DMIOp(DMIOp_M),
 			.clk(clk), .reset(reset), .PC(PC_M)
 );
 
-assign Bridge_Out = PrAddr > 32'h4FFFF ? PrWD : DM_Out;
+
 
 exceptionM ExceptionM (
 	 .IR_M(IR_M),
@@ -307,7 +317,7 @@ cp0 CP0 (
     .DOut(CP0_Out), 
     .reset(reset), 
     .clk(clk), 
-    .WE(CP0_WE_M), 
+    .WE(CP0_WE_M && !(IntReq === 1)), 
     .PC_M(PC_M), .PC_E(PC_E), .PC_D(PC_D), 
 	 .Exc(Exc_EM || Exc_M),
     .ExcCode(Exc_M ? ExcCode_M : ExcCode_EM), 
@@ -315,8 +325,9 @@ cp0 CP0 (
     .IntReq(IntReq), 
     .EPC(EPC),
 	 .eret(eret_M),
-	 .slot(slot_M),
-	 .pause_M(pause_M), .pause_E(pause_E)
+	 .slot_M(slot_M), .slot_E(slot_E), .slot_D(slot_D),
+	 .pause_M(pause_M), .pause_E(pause_E),
+	 .EXLClr(EXLClr)
     );
 
 // W
@@ -332,8 +343,10 @@ control ControlW(.IR(IR_W),
 					  .ALUasel(ALUasel_W), .ALUbsel(ALUbsel_W), .ALUOp(ALUOp_W), .XALUOp(XALUOp_W),
 					  .DM_RE(DM_RE_W), .DM_WE(DM_WE_W), .DMOOp(DMOOp_W), .DMIOp(DMIOp_W),
 					  .A3sel(A3sel_W), .WDsel(WDsel_W), .GRF_WE(GRF_WE_W),
-					  .CP0_WE(CP0_WE_W)
+					  .CP0_WE(CP0_WE_W), .eret(eret_W)
 					  );
+
+assign EXLClr = eret_W;
 
 dmOutput DMOutput(.A(ALUOut_W[1:0]), .DMOOp(DMOOp_W), .RD(DM_W), .DMOut(DMOut));
 
