@@ -32,7 +32,6 @@ module control(
 	 output reg [1:0] ALUasel,
 	 output reg [1:0] ALUbsel,
 	 output reg [3:0] ALUOp,
-	 output [3:0] XALUOp,
 	 
 	 output DM_RE,
 	 output DM_WE,
@@ -50,27 +49,6 @@ module control(
 
 // Branch or Jump
 
-
-
-// XALU
-assign XALUOp = IR[`Op] == `R ? (
-						// R
-						IR[`Func] == `mult	? 1 :
-						IR[`Func] == `multu	? 2 :
-						IR[`Func] == `div 	? 7 :
-						IR[`Func] == `divu	? 8 :
-						IR[`Func] == `mthi	? 3 :
-						IR[`Func] == `mtlo	? 4 :
-						IR[`Func] == `mfhi	? 5 :
-						IR[`Func] == `mflo	? 6 :
-						`x ) : 
-					 IR[`Op] == `special2 ? (
-						// special
-						IR[`Func] == `madd	? 9  :
-						IR[`Func] == `maddu	? 10 :
-						IR[`Func] == `mul 	? 11 :
-						`x ) :
-					 `x;
 
 // DM
 assign DM_RE = IR[`Op] == `lw 	? 1 :
@@ -503,7 +481,25 @@ case (IR[`Op])
 					Tuse_Rs	= 3;
 					Tuse_Rt	= 1;
 				end
+				default: begin
+					NPCsel	= 0;
+					NPCOp		= `x;
+					CMPOp		= `x;
+					ExtOp		= `x;
+					
+					ALUasel	= `x;
+					ALUbsel	= `x;
+					ALUOp		= 4'bxxxx;
 				
+											
+					A3sel		= `x;
+					WDsel		= `x;
+					GRF_WE	= `x;
+					
+					Tnew		= 0;
+					Tuse_Rs	= 3;
+					Tuse_Rt	= 3;
+				end
 				
 			endcase
 			end
@@ -859,6 +855,26 @@ case (IR[`Op])
 			Tuse_Rs	= 1;
 			Tuse_Rt	= 1;
 		end
+		
+		default: begin
+			NPCsel	= 0;
+			NPCOp		= `x;
+			CMPOp		= `x;
+			ExtOp		= `x;
+			
+			ALUasel	= `x;
+			ALUbsel	= `x;
+			ALUOp		= 4'bxxxx;
+		
+									
+			A3sel		= `x;
+			WDsel		= `x;
+			GRF_WE	= `x;
+			
+			Tnew		= 0;
+			Tuse_Rs	= 3;
+			Tuse_Rt	= 3;
+		end
 	endcase
 	end
 	
@@ -872,7 +888,7 @@ case (IR[`Op])
 			
 			ALUasel	= `x;
 			ALUbsel	= `x;
-			ALUOp		= 4'bxxxx;
+			ALUOp		= 4'b0000;
 		
 									
 			A3sel		= `x;

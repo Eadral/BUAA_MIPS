@@ -38,6 +38,7 @@ case (npcOp)
 			NPC = PC + 8;
 	end
 	1: NPC = {PC4[31:28], Add, 2'b00};
+	default: NPC = 32'h3000;
 endcase
 end
 

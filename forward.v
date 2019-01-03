@@ -46,16 +46,7 @@ module forward(
 	 input CP0_WE_E, CP0_WE_M,
 	 output reg [1:0] Forward_EPC
     );
-
-initial begin
-	ForwardRS_D = 0;
-	ForwardRT_D = 0;
-
-	ForwardRT_E = 0;
-	ForwardRS_E = 0;
-
-	ForwardRT_M = 0;
-end
+	 
 
 always @(*) begin
 	

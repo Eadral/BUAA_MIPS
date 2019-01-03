@@ -67,8 +67,6 @@ wire rt = (IR[`Op] == 1) && (
 wire r =  (IR[`Op] == 0) && (
 			  IR[`Func] == 0 || IR[`Func] == 2 || IR[`Func] == 3 || IR[`Func] == 4 || IR[`Func] == 6 || IR[`Func] == 7 ||
  IR[`Func] == 8 || IR[`Func] == 9 || IR[`Func] == 12 || IR[`Func] == 13 ||
- IR[`Func] == 16 || IR[`Func] == 17 || IR[`Func] == 18 || IR[`Func] == 19 ||
- IR[`Func] == 24 || IR[`Func] == 25 || IR[`Func] == 26 || IR[`Func] == 27 ||
  IR[`Func] == 32 || IR[`Func] == 33 || IR[`Func] == 34 || IR[`Func] == 35 || IR[`Func] == 36 || IR[`Func] == 37 || IR[`Func] == 38 ||
  IR[`Func] == 39 || IR[`Func] == 42 || IR[`Func] == 43
 			 );
@@ -143,7 +141,11 @@ wire save = IR_M[`Op] == `sw ? 1 :
 wire AOverflow = !(
 					(A >= 32'h0000_0000 && A <= 32'h0000_2FFF) ||
 					(A >= 32'h0000_7F00 && A <= 32'h0000_7F0B) ||
-					(A >= 32'h0000_7F10 && A <= 32'h0000_7F1B) 
+					(A >= 32'h0000_7F10 && A <= 32'h0000_7F2B) ||
+					(A >= 32'h0000_7F2C && A <= 32'h0000_7F33) ||
+					(A >= 32'h0000_7F34 && A <= 32'h0000_7F37) ||
+					(A >= 32'h0000_7F38 && A <= 32'h0000_7F3F) ||
+					(A >= 32'h0000_7F40 && A <= 32'h0000_7F43) 
 					);
 
 wire NowriteA = (A >= 32'h0000_7F08 && A <= 32'h0000_7F0B) ||

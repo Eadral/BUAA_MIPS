@@ -38,6 +38,7 @@ case (Op)
 	2'b11: begin
 		Out = {{16{In[15]}}, In} << 2;
 	end
+	default: Out = 32'b0;
 endcase
 
 endmodule

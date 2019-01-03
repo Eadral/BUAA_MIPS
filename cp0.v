@@ -32,7 +32,7 @@ module cp0(
 	input Exc,
 	input [6:2] ExcCode, 
 	input [7:2] HWInt,
-	input EXLSet, EXLClr,
+	input EXLClr,
 	output IntReq,
 	output [31:0] EPC,
 	input slot_M, slot_E, slot_D, 
@@ -51,14 +51,6 @@ assign EPC = R[`EPC];
 
 wire [31:0] CAUSE = R[`CAUSE];
 
-
-initial begin
-	R[`SR] = 32'h0000_ff11;
-	R[`CAUSE] = 0;
-	R[`EPC] = 0;
-	R[`PrID] = "ZZYC"; 
-end
-
 wire [7:2] IntBit = R[`SR][`IM] & HWInt;
 wire Inte = R[`SR][`IE] && !R[`SR][`EXL] && (|IntBit);
 
@@ -66,24 +58,24 @@ wire slot = pause_M ? (pause_E ? slot_D === 1 : slot_E === 1) : slot_M === 1;
 
 always @(posedge clk) begin
 	if (reset) begin
-		R[`SR] = 32'h0000_ff11;
-		R[`CAUSE] = 0;
-		R[`EPC] = 0;
-		R[`PrID] = "ZZYC"; 
+		R[`SR] <= 32'h0000_ff11;
+		R[`CAUSE] <= 0;
+		R[`EPC] <= 0;
+		R[`PrID] <= "ZZYC"; 
 	end else if (WE) begin
 		//if (WA == 12 || WA == 14)
 		R[WA] <= DIn;
 	end
 	
-	if (EXLSet)
-		R[`SR][`EXL] <= 1;
+	//if (EXLSet)
+	//	R[`SR][`EXL] <= 1;
 	if (EXLClr)
 		R[`SR][`EXL] <= 0;
 	
-	R[`CAUSE][`IP] <= HWInt;
 	
 	// Interruption
 	if (Inte) begin
+		R[`CAUSE][`IP] <= HWInt;
 		if (slot) begin
 			R[`EPC] <= pause_M ? (pause_E ? PC_D-4 : PC_E-4) : PC_M - 4;
 			R[`CAUSE][`BD] <= 1;
@@ -97,6 +89,7 @@ always @(posedge clk) begin
 	
 	// Exception
 	if (Exc) begin
+		R[`CAUSE][`IP] <= HWInt;
 		if (slot) begin
 			R[`EPC] <= pause_M ? (pause_E ? PC_D-4 : PC_E-4) : PC_M - 4;
 			R[`CAUSE][`BD] <= 1;
@@ -115,7 +108,8 @@ always @(posedge clk) begin
 	
 end
 
-assign IntReq = Exc || Inte;
+//assign IntReq = Exc || Inte;
+assign IntReq = Inte;
 
 wire EXL = R[`SR][`EXL];
 

@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module dm #(parameter SIZE=4096)(
+module pseudo_dm #(parameter SIZE=4096)(
     input [31:0] A,
     input [31:0] WD,
     output [31:0] RD,
@@ -33,9 +33,6 @@ module dm #(parameter SIZE=4096)(
 reg [31:0] dm [0:SIZE-1];
 
 integer i;
-initial 
-	for (i = 0; i < SIZE; i = i + 1)
-		dm[i] = 0;
 
 always @(posedge clk) begin
 	if (Reset) begin
@@ -47,7 +44,7 @@ always @(posedge clk) begin
 		//if (BE[2] == 1) dm[A[13:2]][23:16] = WD[23:16];
 		//if (BE[1] == 1) dm[A[13:2]][15:8] = WD[15:8];
 		//if (BE[0] == 1) dm[A[13:2]][7:0] = WD[7:0];
-		dm[A[13:2]] = WD;
+		dm[A[13:2]] <= WD;
 	end
 end
 

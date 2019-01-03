@@ -34,7 +34,10 @@ module stageF(
 	 
     );
 
-im IM(.PC(PC), .Instr(IR_F));
+wire [31:0] imA = PC - 'h3000;
+//pseudo_im IM(.PC(PC), .Instr(IR_F));
+im IM (.clka(clk), .wea(4'b0000), .addra(imA), .dina(32'b0), .douta(IR_F));
+
 adder ADD4(.A(PC), .B(32'd4), .Out(PC4_F));
 adder ADD8(.A(PC4_F), .B(32'd4), .Out(PC8_F));
 
@@ -98,22 +101,12 @@ module stageE(
 	 output [31:0] ALU_Out,
 	 output Overflow,
 	 
-	 input [31:0] XALUa, XALUb,
-	 input [3:0] XALUOp,
-	 input Start,
-	 output [31:0] XALU_Out,
-	 output Busy,
-	 input rollback,
 	 input clk, reset
 	
     );
 
 
 alu ALU(.A(ALUa), .B(ALUb), .Op(ALUop), .Out(ALU_Out), .Overflow(Overflow));
-
-xalu XALU(.D1(XALUa), .D2(XALUb), .XALUOp(XALUOp), .Start(Start), 
-		.XALU_Out(XALU_Out), .Busy(Busy), .clk(clk), .reset(reset),
-		.rollback(rollback));
 
 endmodule
 
@@ -130,6 +123,7 @@ module stageM(
 	 input DM_WE,
 	 input [2:0] DMIOp,
 	 input clk,
+	 input clk2,
 	 input reset,
 	 
 	 input [31:0] PC
@@ -139,9 +133,13 @@ module stageM(
 wire [31:0] DMIn;
 dmInput DMInput(.A(DM_A[1:0]), .DMIOp(DMIOp), .WD(DM_WD), .DM_Out(DM_Out), .DMIn(DMIn));
 
-dm DM(.A(DM_A), .WD(DMIn), .RD(DM_Out), .RE(DM_RE), .WE(DM_WE), .clk(clk), .Reset(reset), .PC(PC));
+wire [31:0] dm_a = (DM_A >= 32'h0000_0000 && DM_A <= 32'h0000_2fff) ? DM_A : 32'b0;
+//pseudo_dm DM(.A(DM_A), .WD(DMIn), .RD(DM_Out), .RE(DM_RE), .WE(DM_WE), .clk(clk), .Reset(reset), .PC(PC));
+dm DM ( .clka(clk2), .rsta(reset), .wea(DM_WE ? 4'b1111 : 4'b0000), .addra({dm_a[31:2], 2'b00}), .dina(DMIn), .douta(DM_Out));
 
-
+always @(posedge clk)
+if (DM_WE)
+	$display("%d@%h: *%h <= %h", $time, PC, {dm_a[31:0]}, DMIn);
 
 endmodule
 

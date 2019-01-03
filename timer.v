@@ -46,15 +46,6 @@ parameter IDLE = 0,
 
 reg IRQ;
 
-initial begin
-	CTRL = 0;
-	PRESET = 0;
-	COUNT = 0;
-	
-	state = IDLE;
-	IRQ = 0;
-end
-
 assign IRQ_O = IM ? IRQ : 0;
 
 always @(posedge clk) begin
@@ -66,12 +57,12 @@ always @(posedge clk) begin
 		endcase
 	end else
 	if (reset) begin
-		CTRL = 0;
-		PRESET = 0;
-		COUNT = 0;
+		CTRL <= 0;
+		PRESET <= 0;
+		COUNT <= 0;
 		
-		state = IDLE;
-		IRQ = 0;
+		state <= IDLE;
+		IRQ <= 0;
 	end else begin
 	case (state)
 		IDLE: begin

@@ -26,11 +26,6 @@ module pc(
     input Reset
     );
 
-
-initial begin
-	PC = 32'h0000_3000;
-end
-
 always @(posedge clk) begin
 	if (Reset)
 		PC <= 32'h0000_3000;

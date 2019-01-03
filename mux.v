@@ -43,6 +43,7 @@ case (s)
 	2'b01: out = d1;
 	2'b10: out = d2;
 	2'b11: out = d3;
+	default: out = 0;
 endcase
 	
 endmodule 
@@ -64,6 +65,7 @@ case (s)
 	3'b101: out = d5;
 	3'b110: out = d6;
 	3'b111: out = d7;
+	default: out = 0;
 endcase
 	
 endmodule 

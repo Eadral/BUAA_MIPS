@@ -8,7 +8,7 @@
 `define Imm 15:0
 `define Addr 25:0
 
-`define x 32'bx
+`define x 32'b0
 
 // macro
 `define R 6'b000000

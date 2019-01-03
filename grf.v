@@ -37,9 +37,6 @@ assign RD1 = R[RA1];
 assign RD2 = R[RA2];
 
 integer i;
-initial 
-	for (i = 0; i < 32; i = i + 1)
-		R[i] = 0;
 
 
 always @(posedge clk) begin
